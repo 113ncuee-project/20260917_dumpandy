@@ -150,6 +150,34 @@ class EvaluatorTests(unittest.TestCase):
         self.assertEqual(extracted.block_graph()["kind"], "semantic_block_dag")
         self.assertAlmostEqual(sum(block.macs_g for block in extracted.blocks), model.macs_g, places=6)
 
+    def test_model_catalog_covers_six_cnn_families(self):
+        models = load_models(ROOT / "configs" / "models.json")
+        expected = {
+            "resnet18",
+            "resnet50",
+            "shufflenet_v2_x1_0",
+            "shufflenet_v2_x2_0",
+            "mobilenet_v2",
+            "efficientnet_b0",
+        }
+        self.assertEqual(set(models), expected)
+        for model in models.values():
+            self.assertGreater(len(model.blocks), 0)
+            self.assertAlmostEqual(
+                sum(block.macs_g for block in model.blocks),
+                model.macs_g,
+                places=6,
+                msg=model.name,
+            )
+
+        mobilenet, mobilenet_report = extract_semantic_blocks(models["mobilenet_v2"])
+        efficientnet, efficientnet_report = extract_semantic_blocks(models["efficientnet_b0"])
+        self.assertEqual(mobilenet_report.source, "semantic")
+        self.assertEqual(efficientnet_report.source, "semantic")
+        self.assertIn("InvertedResidual", {block.block_type for block in mobilenet.blocks})
+        self.assertIn("MBConv", {block.block_type for block in efficientnet.blocks})
+        self.assertTrue(all(block.branch_closed for block in mobilenet.blocks + efficientnet.blocks))
+
     def test_direct_workload_allows_any_group_parallelism(self):
         cfg = load_config(ROOT / "configs" / "defaults.json")
         model = load_models(ROOT / "configs" / "models.json")["resnet18"]

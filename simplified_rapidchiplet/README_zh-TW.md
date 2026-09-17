@@ -13,12 +13,36 @@
 
 ```powershell
 py -3 .\preference_dse.py `
-  --models resnet50 `
   --preference balanced `
   --budget 64 `
   --min-fps 15 `
   --out .\results\preference_balanced
 ```
+
+不指定 `--models` 時，這個指令會依序跑目前內建的 6 個模型；如果只想跑其中幾個，可以明確指定：
+
+```powershell
+python .\preference_dse.py `
+  --models resnet18 resnet50 mobilenet_v2 efficientnet_b0 `
+  --preference latency `
+  --budget 8 `
+  --min-fps 15 `
+  --out .\results\preference_latency_four_models
+```
+
+目前的模型 catalog 是：
+
+| 模型 | block 形式 | 用來覆蓋的需求 |
+|---|---|---|
+| `resnet18` | legacy stage fallback | 較小的 residual baseline |
+| `resnet50` | 18 個 `Bottleneck` semantic blocks | 深層 residual network |
+| `shufflenet_v2_x1_0` | legacy stage fallback | 輕量 channel-shuffle network |
+| `shufflenet_v2_x2_0` | legacy stage fallback | 較寬的 channel-shuffle network |
+| `mobilenet_v2` | `InvertedResidual` semantic blocks | depthwise-separable mobile network |
+| `efficientnet_b0` | `MBConv` semantic blocks | compound-scaled mobile network |
+
+這些模型目前是 `configs/models.json` 裡的 analytical workload metadata，
+不是把 PyTorch 權重打包進 repository；所以執行工具不需要安裝 PyTorch，也不需要下載模型權重。每個 semantic block 都明確記錄 block type、融合後的 operators、MACs、input/output/weight memory、branch closure 和 dependency。這讓同一套 DSE 可以比較 residual、channel-shuffle、InvertedResidual 與 MBConv 等不同 CNN 結構。
 
 ResNet-50 會依照模型原生階層建立 18 個 semantic blocks：
 `Stem + Conv2_x 的 3 個 Bottleneck + Conv3_x 的 4 個 Bottleneck +

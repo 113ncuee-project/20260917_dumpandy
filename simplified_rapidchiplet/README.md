@@ -45,13 +45,31 @@ Open `report.html` in a browser for the visual summary.
 
 ## Defaults
 
-- models: `resnet50`, `shufflenet_v2_x1_0`
+- models: all 6 entries in `configs/models.json` when `--models` is omitted
 - target FPS: `15`
 - available chiplets: up to `16`
 - chiplet capacity: `8 x 8` PEs at `200 MHz`
 - topology: `mesh` only
 - workload search: `pareto-dp` with `--dp-top-k 12` (use brute-force as an oracle for validation)
 - PPA goal: `balanced`
+
+The initial model catalog intentionally covers several CNN families instead of
+only ResNet-50:
+
+| Model | Block representation | Purpose |
+|---|---|---|
+| `resnet18` | legacy stage fallback | small residual baseline |
+| `resnet50` | semantic `Bottleneck` blocks | deeper residual network |
+| `shufflenet_v2_x1_0` | legacy stage fallback | lightweight channel-shuffle model |
+| `shufflenet_v2_x2_0` | legacy stage fallback | wider channel-shuffle model |
+| `mobilenet_v2` | semantic `InvertedResidual` blocks | depthwise-separable mobile model |
+| `efficientnet_b0` | semantic `MBConv` blocks | compound-scaled mobile model |
+
+These entries are analytical workload metadata in
+`configs/models.json`. They are deliberately dependency-free; the DSE engine
+does not need PyTorch or pretrained weights to compare partitioning, mapping,
+chiplet count, communication, and E2E latency. Pass one or more names to
+`--models`, or omit the option to run the complete six-model catalog.
 
 ## Useful Commands
 

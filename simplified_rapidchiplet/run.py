@@ -18,8 +18,8 @@ def main() -> None:
     parser.add_argument(
         "--models",
         nargs="*",
-        default=["resnet50", "shufflenet_v2_x1_0"],
-        help="Model names. Default: resnet50 shufflenet_v2_x1_0.",
+        default=None,
+        help="Model names. Default: run every model in configs/models.json.",
     )
     parser.add_argument(
         "--topologies",

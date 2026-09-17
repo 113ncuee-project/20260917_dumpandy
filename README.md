@@ -42,6 +42,22 @@ py -3 .\preference_dse.py --models resnet50 --preference balanced --budget 64 --
 
 它會依照 ResNet-50 的原生階層建立 18 個 semantic blocks，允許任意 block group 使用多顆 chiplet，並以 user preference 產生 constraint-first RL reward。詳細說明請看 `simplified_rapidchiplet/README_zh-TW.md`。
 
+目前內建 6 個可直接拿來跑 DSE 的 CNN workload：
+
+- `resnet18`：legacy stage metadata，作為較小的殘差網路基準。
+- `resnet50`：18 個原生 Bottleneck semantic blocks。
+- `shufflenet_v2_x1_0`、`shufflenet_v2_x2_0`：不同寬度的 channel-shuffle 網路。
+- `mobilenet_v2`：由 Stem、InvertedResidual 與 Head 組成。
+- `efficientnet_b0`：由 Stem、MBConv 與 Head 組成。
+
+不指定 `--models` 時，preference DSE 會對這 6 個模型全部執行；也可以指定其中數個，例如：
+
+```powershell
+python .\preference_dse.py --models resnet18 resnet50 mobilenet_v2 efficientnet_b0 --preference latency --budget 8 --min-fps 15
+```
+
+這些模型目前是由 `configs/models.json` 提供的 analytical workload metadata，不需要安裝 PyTorch 或下載權重；因此適合先驗證 block/mapping/chiplet 搜尋流程。若之後要對接真實 ONNX/PyTorch graph，再將相同欄位替換成模型匯出的資料即可。
+
 目前 `avg_latency_ns` 已改成 Batch=1 analytical end-to-end latency：
 `sum(group compute) + sum(boundary/mapping communication service)`。RapidChiplet
 的 traffic-weighted ICI latency 會另外輸出為 `rapid_avg_latency_ns`，不再直接
