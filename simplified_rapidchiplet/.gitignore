@@ -1,0 +1,19 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Generated outputs
+results/
+
+# Browser automation profiles and crash dumps
+edge-profile/
+Crashpad/
+*.dmp
+
+# Local environments
+.venv/
+venv/
+env/
+
