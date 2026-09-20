@@ -1,0 +1,154 @@
+{
+  "python": "3.13.15 (tags/v3.13.15:4061bc4, Aug  5 2026, 13:05:39) [MSC v.1944 64 bit (AMD64)]",
+  "job_id": "4097b6291f324c54af351b44af5335a4",
+  "bandwidth_bits_per_cycle": 256.0,
+  "request": {
+    "models": [
+      "resnet50",
+      "resnet18",
+      "mobilenet_v2",
+      "squeezenet1_1"
+    ],
+    "preference": "latency",
+    "limits": {
+      "power_w": 16,
+      "area_mm2": 800,
+      "latency_ms": 500
+    },
+    "strict": {
+      "power": true,
+      "area": true,
+      "latency": false
+    },
+    "budget": 128,
+    "seed": 20260919
+  },
+  "models": [
+    {
+      "model": "resnet50",
+      "backend": "official",
+      "chiplets": 9,
+      "latency_ms": 205.7630526287493,
+      "power_w": 7.8943636187501465,
+      "area_mm2": 712.5259085625046,
+      "unique_evaluations": 128,
+      "all_targets_met": true,
+      "svg_verified": true
+    },
+    {
+      "model": "resnet18",
+      "backend": "official",
+      "chiplets": 9,
+      "latency_ms": 28.261592490636705,
+      "power_w": 7.8943636187501465,
+      "area_mm2": 712.5259085625046,
+      "unique_evaluations": 113,
+      "all_targets_met": true,
+      "svg_verified": true
+    },
+    {
+      "model": "mobilenet_v2",
+      "backend": "official",
+      "chiplets": 2,
+      "latency_ms": 31.335738333333335,
+      "power_w": 1.6797386348958456,
+      "area_mm2": 156.1196590468754,
+      "unique_evaluations": 128,
+      "all_targets_met": true,
+      "svg_verified": true
+    },
+    {
+      "model": "squeezenet1_1",
+      "backend": "official",
+      "chiplets": 1,
+      "latency_ms": 36.36999333333333,
+      "power_w": 0.8175,
+      "area_mm2": 77.40000000000002,
+      "unique_evaluations": 89,
+      "all_targets_met": true,
+      "svg_verified": true
+    }
+  ],
+  "source": "Actual four-model GUI HTTP API run with official RapidChiplet",
+  "unit_tests_passed": 67,
+  "configuration": {
+    "evaluation": {
+      "max_chiplets": 16
+    },
+    "chiplet": {
+      "pe_rows": 8,
+      "pe_cols": 8,
+      "frequency_hz": 200000000,
+      "op_per_mac": 2,
+      "ops_per_pe_per_cycle": 2,
+      "utilization": 0.75,
+      "width_mm": 8.79772697916911,
+      "spacing_mm": 0.15,
+      "internal_latency_cycles": 3,
+      "phy_latency_cycles": 12,
+      "sram_mb": 16.0
+    },
+    "network": {
+      "link_bandwidth_bits_per_cycle": 256.0,
+      "link_latency_base_cycles": 1,
+      "link_latency_cycles_per_mm": 0.25
+    },
+    "power": {
+      "chiplet_static_w": 0.15,
+      "chiplet_peak_dynamic_w": 0.85,
+      "phy_w": 0.03,
+      "link_static_w_per_mm": 0.005,
+      "link_dynamic_pj_per_bit": 0.5
+    },
+    "rapidchiplet": {
+      "root": "../.runtime/rapidchiplet",
+      "backend": "official"
+    },
+    "ppa": {
+      "max_latency_ns": 500000000.0,
+      "max_area_mm2": 800.0,
+      "max_power_w": 16.0
+    },
+    "strict_constraints": {
+      "latency": true,
+      "area": true,
+      "power": true
+    },
+    "search": {
+      "evaluation_budget": 128,
+      "max_episodes": 3000,
+      "seed": 20260919,
+      "learning_rate": 0.2,
+      "epsilon_start": 0.8,
+      "epsilon_end": 0.05,
+      "epsilon_decay": 0.99
+    },
+    "experiment": {
+      "kind": "baseline",
+      "effective_link_bandwidth_bits_per_cycle": 256.0,
+      "source": "User-confirmed 256 bits/cycle/direction; FPS is output only"
+    }
+  },
+  "sha256": {
+    "configs/defaults.json": "0e01dc0498365dffdd807d5920d812cba3ed14f73aaf4f0e7472d342dcdc0a69",
+    "configs/models.json": "e40c4b2ca8da909a792ddfc97e023e941dc04f26c448f4cdd23c1e797b929023",
+    "simple_rapidchiplet/__init__.py": "063533f360cff8a2417dfbb99da9a3bbccf4a1f44bad379ede7d2d27ee143af2",
+    "simple_rapidchiplet/block_extractor.py": "a33d62024c1402ad8b5625c929df795fc01db5a8273549d80c66d8bcdc6f0105",
+    "simple_rapidchiplet/communication.py": "bf62eab076081672c63aa631e8ceb95c8ad28610485ac8d237951e01cf9a8dc6",
+    "simple_rapidchiplet/config.py": "362c6d44b0c57c107059d54856f25be010f0203c4acfe73d4803a06360fd3a6b",
+    "simple_rapidchiplet/dag_scheduler.py": "19f2c30ba976e13f1d72053691f0aae74a01d22d0b8c36b821a3cb7f0d6c0430",
+    "simple_rapidchiplet/e2e_latency.py": "8383c719da04edeae2c7a2dc87fbfed44d4f3a134113e8a0c5f4bf33ecac57d3",
+    "simple_rapidchiplet/evaluator.py": "cf95e881fa7e006b0c4ae6879e750a033d90ac6c4b27f7a75ae3508b69e6912d",
+    "simple_rapidchiplet/gui_server.py": "2449f42b6e9a32b10c0a7dc5ea0416d4c20a2c6de0e497c05c9f7aaf8eafb64b",
+    "simple_rapidchiplet/mapping.py": "3f8e9b77468b4706b5a7405458edec64dd0e64c8c160a558d746ecf398af1f6f",
+    "simple_rapidchiplet/model.py": "d3ba94ea6fb3cccceebf1df617375bdc4a8284aba9cbc3d2859af8d3d84220f9",
+    "simple_rapidchiplet/placement_svg.py": "b0f3c8e5eca44c3f87c99a87855d7bb22c481608e85b811d11b5dfb14ffc43b0",
+    "simple_rapidchiplet/preference_dse.py": "c78c1dfae9d8612ec211a223ca9ff17bf350074cc715914a93a9505f789ed64a",
+    "simple_rapidchiplet/rapid_proxy.py": "b1b9339991191f97aa82fa35322affc6c02996a54ba17ffe180d3bbe1fd9db67",
+    "simple_rapidchiplet/rapidchiplet_engine.py": "1fc849aae9c012994da8f3af14102bbffc9306e1ce0a654bfca1325a06a1ca0c",
+    "simple_rapidchiplet/report.py": "886be7a02100bc8495b95d0c92084494a437e122bee0cc36c8a76f8ee8d75472",
+    "simple_rapidchiplet/routing.py": "ffafa662368e194ad7c8937e5aa3e63a850ba99acb39bbc9d6f101d0d3602bd1",
+    "simple_rapidchiplet/topology.py": "2b263ef68725d6a4133052fbfedab4a4daebdc3471639b137d5b46908d21964b",
+    "simple_rapidchiplet/workload.py": "f4f3690309969c68b70b1b10e4397bd5a9fde7cb1bc95cd01d36475586cb4ee6"
+  }
+}

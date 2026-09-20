@@ -13,7 +13,7 @@ python .\run.py --preference balanced --max-latency-ns 500000000 --max-area-mm2 
 ```
 
 - Defaults: `configs/defaults.json`; calibrated workloads: ResNet-50 v1.5, ResNet-18, MobileNetV2 and SqueezeNet 1.1, batch 1, FP32. All four have actual CPU forward / shape / parameter / Conv+Linear MAC records in `validation/model_forward_validation.json`.
-- Hardware preserves the supplied 0815 values, including 0.8175 W per chiplet and the explicit **0.3 bits/cycle/direction** stress bandwidth. **256** is the reference bandwidth, not the active default.
+- Hardware uses 0.8175 W per chiplet and the user-confirmed **256 bits/cycle/direction** default link bandwidth.
 - The official Rapid engine receives generated inputs and explicit directed link bandwidths. The portable default is `root=../.runtime/rapidchiplet` relative to the config file and `backend=official`; the launcher prepares it automatically. No per-machine path is needed, and failed official imports do not silently fall back.
 - Results: `results/preference_dse/preference_search_summary.csv`, full JSON, and a configuration/source-hash manifest.
 - Failed strict PPA constraints exclude a design from both best candidate and policy delivery; no acceptable result means `best_candidate=null`. Unchecked constraints permit overshoot with explicit bonus/penalty. CLI: `--no-strict-latency`, `--no-strict-area`, `--no-strict-power`. A 128-evaluation search is not a global optimum certificate.
@@ -23,4 +23,4 @@ python -m unittest discover -s tests
 python tools/validate_0917.py
 ```
 
-The validation script requires the official engine and compares matched-budget Q-learning and random search. Its current output is `multi_seed_comparison_v4.json`; older records retain the old scoring definition. EfficientNet/ShuffleNet entries and historical DP/presentation helpers remain prototypes. MobileNetV2 IC and within-Fire parallel mapping are deliberately masked until validated; see the GUI guide for supported traffic semantics.
+The validation script requires the official engine and compares matched-budget Q-learning and random search. Its current output is `multi_seed_comparison_v4.json`. EfficientNet/ShuffleNet entries and historical DP/presentation helpers remain prototypes. MobileNetV2 IC and within-Fire parallel mapping are deliberately masked until validated; see the GUI guide for supported traffic semantics.

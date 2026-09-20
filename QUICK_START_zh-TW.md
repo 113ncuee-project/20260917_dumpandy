@@ -13,6 +13,6 @@
 
 如果下載失敗，確認能連到 `www.python.org` 與 `raw.githubusercontent.com`，再雙擊同一檔案重試；已正確下載的檔案不會重抓。套件只寫入專案中的 `.runtime`，不變更系統 Python 或永久環境變數。
 
-此版本使用官方 RapidChiplet 分析核心，沒有把它換成本地簡化 proxy。預設硬體保留 200 MHz、16 MiB SRAM、0.8175 W/chiplet 與 0.3 bits/cycle/direction。四個模型的 metadata 已完成 CPU forward 校驗，因此執行設計搜尋不必下載 PyTorch。
+此版本使用官方 RapidChiplet 分析核心，沒有把它換成本地簡化 proxy。預設硬體保留 200 MHz、16 MiB SRAM、0.8175 W/chiplet 與 256 bits/cycle/direction。四個模型的 metadata 已完成 CPU forward 校驗，因此執行設計搜尋不必下載 PyTorch。
 
 細節：[GUI 與模型說明](simplified_rapidchiplet/GUI_GUIDE_zh-TW.md) · [可攜包與驗證](simplified_rapidchiplet/PORTABLE_PACKAGE_zh-TW.md)。

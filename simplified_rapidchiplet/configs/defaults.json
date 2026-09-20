@@ -16,7 +16,7 @@
     "sram_mb": 16.0
   },
   "network": {
-    "link_bandwidth_bits_per_cycle": 0.3,
+    "link_bandwidth_bits_per_cycle": 256.0,
     "link_latency_base_cycles": 1,
     "link_latency_cycles_per_mm": 0.25
   },
@@ -51,9 +51,8 @@
     "epsilon_decay": 0.99
   },
   "experiment": {
-    "kind": "network_limit_sensitivity_test",
-    "baseline_link_bandwidth_bits_per_cycle": 256.0,
-    "effective_link_bandwidth_bits_per_cycle": 0.3,
-    "source": "user-supplied 0815 hardware; FPS is output only"
+    "kind": "baseline",
+    "effective_link_bandwidth_bits_per_cycle": 256.0,
+    "source": "User-confirmed 256 bits/cycle/direction; FPS is output only"
   }
 }

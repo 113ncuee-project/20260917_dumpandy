@@ -1,4 +1,5 @@
 """Verify the portable runtime, official engine, four models, GUI API and SVG."""
+import argparse
 import json
 import sys
 import threading
@@ -13,8 +14,12 @@ from simple_rapidchiplet.gui_server import Application, make_server
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--budget', type=int, default=2)
+    args = parser.parse_args()
     app = Application(ROOT)
     assert app.cfg.rapidchiplet.backend == 'official'
+    assert app.cfg.network.link_bandwidth_bits_per_cycle == 256
     assert Path(app.cfg.rapidchiplet.root).is_relative_to(ROOT)
     server = make_server(app, 0)
     worker = threading.Thread(target=server.serve_forever, daemon=True)
@@ -28,18 +33,21 @@ def main():
         assert b'Chiplet Lab' in request('/')
         config = json.loads(request('/api/config'))
         assert len(config['models']) == 4
+        assert config['hardware']['network']['link_bandwidth_bits_per_cycle'] == 256
         data = dict(models=[m['name'] for m in config['models']], preference='latency',
                     limits=dict(power_w=16, area_mm2=800, latency_ms=500),
-                    strict=dict(power=True, area=True, latency=False), budget=2, seed=20260919)
+                    strict=dict(power=True, area=True, latency=False), budget=args.budget, seed=20260919)
         job = json.loads(request('/api/jobs',data))
-        deadline = time.monotonic()+120
+        deadline = time.monotonic()+600
         while job['status']=='running' and time.monotonic()<deadline:
             time.sleep(.05)
             job = json.loads(request('/api/jobs/'+job['id']))
         assert job['status']=='completed', job
         assert len(job['results'])==4 and not job['errors']
         report = dict(python=sys.version, executable=sys.executable, project=str(ROOT),
-                      official_root=app.cfg.rapidchiplet.root, job_id=job['id'], models=[])
+                      official_root=app.cfg.rapidchiplet.root, job_id=job['id'],
+                      bandwidth_bits_per_cycle=app.cfg.network.link_bandwidth_bits_per_cycle,
+                      request=data, models=[])
         for r in job['results']:
             c = r['best_candidate']
             assert c and c['backend']=='official' and r['best_breakdown']['admissible'], r
@@ -47,7 +55,9 @@ def main():
             doc = ElementTree.fromstring(svg)
             assert len(doc.findall('{http://www.w3.org/2000/svg}rect')) == c['selected_chiplets']
             report['models'].append(dict(model=r['model'],backend=c['backend'],chiplets=c['selected_chiplets'],
-                                         latency_ms=c['avg_latency_ns']/1e6,svg_verified=True))
+                                         latency_ms=c['avg_latency_ns']/1e6, power_w=c['total_power_w'],
+                                         area_mm2=c['total_area_mm2'], unique_evaluations=r['unique_evaluations'],
+                                         all_targets_met=r['best_breakdown']['feasible'], svg_verified=True))
         assert json.loads(request('/api/jobs/'+job['id']+'/results.json'))['status']=='completed'
         assert b'latency_ms' in request('/api/jobs/'+job['id']+'/summary.csv')
         output = ROOT/'results/portable_smoke.json'

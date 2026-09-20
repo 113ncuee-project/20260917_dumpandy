@@ -8,7 +8,7 @@
 
 | 類別 | 內容 | 可以怎麼表述 |
 | --- | --- | --- |
-| 使用者附檔／0815 平台沿用 | 8×8 PE、200 MHz、utilization 0.75、寬度 8.79772697916911 mm、間距 0.15 mm、internal/PHY latency 3/12 cycles、有效頻寬 0.3、power 相關係數 | 沿用實驗平台設定；僅因沿用，不能認定有實測依據。256 是附檔另列的頻寬基準。 |
+| 使用者附檔／0815 平台沿用 | 8×8 PE、200 MHz、utilization 0.75、寬度 8.79772697916911 mm、間距 0.15 mm、internal/PHY latency 3/12 cycles、正式頻寬 256、power 相關係數 | 沿用實驗平台設定；僅因沿用，不能認定有實測依據。256 bits/cycle/direction 為使用者確認的正式設定。 |
 | 0917 既有平台設定 | 每顆 SRAM 16 MiB、最多 16 chiplets | 設計空間的容量假設；不是由 ResNet 必然推導出來的數字。 |
 | 修正版固定的模型定義 | ResNet-50 v1.5、batch 1、FP32、224×224、1000 classes，依形狀公式重算 metadata | 模型規格與公式推導；沒有執行 PyTorch inference、accuracy 或 accelerator benchmark。 |
 | 實作採用的建模選擇 | OC/IC efficiency、平均分工、保守 SRAM buffer、通訊協定、串行 E2E、固定功耗、RL reward／超參數 | 需要明列為假設或演算法選擇，不能當作量測事實。 |
@@ -47,7 +47,6 @@
 | R5 | epsilon 每 episode 衰減，包括命中 cache 的 episode；連續 50 次無新設計強制探索 | 可能在取得足夠新設計前降低探索；50、0.99 等均為未充分調參的選擇。 |
 | R6 | 固定 learning rate 0.2、最多 500 sweeps；以 Q 更新量<1e-12 作 replay 終止條件 | 不是完整設計空間收斂證明；調極小 learning rate 時，小更新量也不等同小 Bellman residual。CLI 記錄 replay/policy flags，但沒有在所有非預設設定下強制成功。 |
 | R7 | 預設 128 unique evaluations／最多 3000 episodes；空間約 20,176,298 個 | 預算有限，不保證找到可行解或全域最優；完整枚舉的最佳性只對受測的小型支援空間成立。 |
-| R8 | 最終 0.3 頻寬三 seed：相同評估預算下對 random 一勝兩負；256 四偏好各一 seed，都保留相同起始候選 | 尚無穩定 RL 優勢、統計顯著性或充分多模型證據；也不能把找到的 256 可行解歸功於 RL 優於啟發式。 |
 | R9 | official/local parity、traffic regression、Q-policy 測試通過 | 兩條評估路徑共用多項假設；一致性不是獨立物理校準，也未驗證 IC reduction 的數值誤差／accuracy。 |
 
 ## 四、工程層面還沒完全收尾的地方
@@ -89,7 +88,7 @@ FPS 保持輸出指標，不恢復 target/minimum FPS。
 | chiplet.sram_mb | 16 MiB | mapping feasibility；目前不自動影響 chiplet area/power。 |
 | chiplet.width_mm / spacing_mm | 8.79772697916911 / 0.15 | package 外框、link 長度、link latency/static power；width 不等同已校準電路規模。 |
 | chiplet.internal_latency_cycles / phy_latency_cycles | 3 / 12 | path latency。 |
-| network.link_bandwidth_bits_per_cycle | 0.3，每方向 | serialization、network FPS；256 只能作明確另列的 baseline。 |
+| network.link_bandwidth_bits_per_cycle | 256，每方向 | serialization、network FPS；200 MHz 下每方向 51.2 Gbit/s。 |
 | network.link_latency_base_cycles / link_latency_cycles_per_mm | 1 / 0.25 | `ceil(base + slope × length)`。 |
 | power.chiplet_static_w / chiplet_peak_dynamic_w / phy_w | 0.15 / 0.85 / 0.03 W | 每顆固定 power；PHY 是 aggregate 項。 |
 | power.link_static_w_per_mm | 0.005 | link 長度相關 power。 |
@@ -122,7 +121,7 @@ FPS 保持輸出指標，不恢復 target/minimum FPS。
 5. 決定 constraint-first 與 preference 在不可行區域的需求；若需要偏好全程影響決策，改 reward 後再驗證，而不是宣稱目前已經做到。
 6. 最後做 matched-budget、多 seed、多 workload 比較；同时呈現 median、分散程度、可行率與 runtime。把 regression 正確性、數值模型精度、搜尋品質分開報告。
 
-可先規劃的敏感度測試（不是已執行或推薦硬體規格）：頻寬 0.3/1.5/16/64/256、budget 128/512/2048；mapping efficiency 使用現有值與全部 1 的消融；每組固定一批 seeds。SRAM 8/16/32 MiB 的掃描若尚無成本耦合，只能標示「容量敏感度」，不能當成公平硬體 PPA 比較。
+可先規劃的敏感度測試（不是已執行或推薦硬體規格）：頻寬 64/128/256/512、budget 128/512/2048；mapping efficiency 使用現有值與全部 1 的消融；每組固定一批 seeds。SRAM 8/16/32 MiB 的掃描若尚無成本耦合，只能標示「容量敏感度」，不能當成公平硬體 PPA 比較。
 
 ## 程式證據
 

@@ -99,7 +99,7 @@ E2E 仍為 `Σ compute + Σ serialization + Σ path`，未模擬 DRAM/cache stal
 
 RL 為每個模型／偏好重新訓練的 tabular Q-learning，不宣稱跨模型泛化。128 次 unique evaluation、3000 episodes 不是完整搜尋；停止原因與實際次數都輸出。嚴格模式「本次未找到」不等於證明無解。小空間多 seed 的窮舉對照驗證 Q policy 與 best archive；實際大模型結果仍需多 seed、相同預算 baseline 和 sensitivity 分析。
 
-硬體繼續使用 **0.3 bits/cycle/direction** 的有效壓力測試頻寬，而非註記中的 256。單 chiplet 為 **0.8175 W**；不能為了得到漂亮結果自動換掉頻寬或 power。
+正式 link bandwidth 為 **256 bits/cycle/direction**，200 MHz 下每方向 **51.2 Gbit/s（6.4 GB/s）**。單 chiplet 為 **0.8175 W**。
 
 ## 驗證
 
@@ -107,23 +107,6 @@ RL 為每個模型／偏好重新訓練的 tabular Q-learning，不宣稱跨模�
 python -m unittest discover -s tests
 ```
 
-63 項測試通過，涵蓋逐項嚴格／軟限制、所有嚴格候選被拒絕時的 JSON/CSV、reward 連續性與單調性、Q policy 小空間多 seed 對照、depthwise 通訊、Fire mapping mask、模型 shape/MAC/parameter 一致性，以及實際 HTTP 搜尋與匯出。
+67 項測試通過，涵蓋逐項嚴格／軟限制、所有嚴格候選被拒絕時的 JSON/CSV、reward 連續性與單調性、Q policy 小空間多 seed 對照、depthwise 通訊、Fire mapping mask、模型 shape/MAC/parameter 一致性，以及實際 HTTP 搜尋與匯出。
 
-瀏覽器另實際驗證多模型搜尋、權重切換、取消、重新整理、chiplet 點選、事件 route overlay 與模型切換。多模型執行摘要見 `validation/gui_multimodel_validation.json`。舊 `VALIDATION_0917_zh-TW.md`、`ASSUMPTIONS_AUDIT_20260920_zh-TW.md` 是 GUI 修改前的歷史基準；涉及模型、reward 與嚴格限制的部分以本文件為準。
-
-## 本次實際搜尋結果
-
-官方 RapidChiplet backend、原始 0.3 bits/cycle/direction、seed 20260919、偏好 Latency 0.6／Area 0.2／Power 0.2。限制為 16 W／800 mm²／500 ms；Power 與 Area 嚴格，Latency 為軟限制：
-
-| 模型 | Chiplets | Power W | Area mm² | Latency ms | PPA 目標 |
-|---|---:|---:|---:|---:|---|
-| ResNet-50 | 9 | 7.894364 | 712.525909 | 2902.068413 | Latency 軟目標超標，已扣 penalty |
-| ResNet-18 | 6 | 5.218170 | 473.682613 | 377.361156 | 三項達標 |
-| MobileNetV2 | 2 | 1.679739 | 156.119659 | 35.512172 | 三項達標 |
-| SqueezeNet 1.1 | 1 | 0.817500 | 77.400000 | 36.369993 | 三項達標 |
-
-前三者各評估 128 個不同設計；SqueezeNet 在 3000 episodes 上限時評估 89 個不同設計，故沒有宣稱跑滿 128。四者的 Q greedy policy reward 均與最佳已評估可接受設計一致。
-
-另以相同設定勾選三項嚴格限制，MobileNetV2／SqueezeNet 有符合結果，兩個 ResNet 在本次搜尋預算內未找到可接受設計，輸出均為 null。ResNet-18 在軟模式已找到 377.361 ms 的設計，直接說明「嚴格搜尋本次沒找到」**不能**當成無解證明：reward 會改變探索路徑，有限預算 RL 可能漏掉可行解。本版未宣稱 RL 已達全域最優。
-
-軟模式完整結果與四張實際 SVG：`results/gui/6a886717acb74a7c8ccebc12b8098438/`。嚴格模式結果：`results/gui/74b292a2ff704c4186a0423093d957ad/`。SVG 的 HTTP 匯出已核對 node 座標、尺寸、physical link 與 route 數量；瀏覽器亦成功收到下載事件。
+瀏覽器另實際驗證多模型搜尋、權重切換、取消、重新整理、chiplet 點選、事件 route overlay 與模型切換。最新正式頻寬驗證見 `VALIDATION_0917_zh-TW.md`。舊 `VALIDATION_0917_zh-TW.md`、`ASSUMPTIONS_AUDIT_20260920_zh-TW.md` 是 GUI 修改前的歷史基準；涉及模型、reward 與嚴格限制的部分以本文件為準。

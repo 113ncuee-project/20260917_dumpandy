@@ -1,7 +1,6 @@
 """Reproducible bounded Q-policy and matched-budget random-search comparison.
 
-Run from the project root. The 256-bit case is an explicit sensitivity case;
-it never overwrites the user's 0.3-bit default hardware configuration.
+Run from the project root using the official 256-bit default configuration.
 """
 import json
 import random
@@ -24,8 +23,8 @@ def validate():
     cfg = replace(cfg, rapidchiplet=replace(cfg.rapidchiplet, backend='official'))
     model = load_models(ROOT / 'configs/models.json')['resnet50']
     records = []
-    cases = [(0.3, 'balanced', seed) for seed in (20260919, 20260920, 20260921)]
-    cases += [(256., pref, 20260919) for pref in ('balanced', 'latency', 'area', 'power')]
+    cases = [(256., 'balanced', seed) for seed in (20260919, 20260920, 20260921)]
+    cases += [(256., pref, 20260919) for pref in ('latency', 'area', 'power')]
     for bandwidth, preference, seed in cases:
         effective = replace(cfg, network=replace(cfg.network, link_bandwidth_bits_per_cycle=bandwidth))
         profile = make_preference_profile(preference, cfg=effective, **effective.ppa)

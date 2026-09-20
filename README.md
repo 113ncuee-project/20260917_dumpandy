@@ -15,7 +15,7 @@ cd .\simplified_rapidchiplet
 python .\run.py --preference balanced --max-latency-ns 500000000 --max-area-mm2 800 --max-power-w 16
 ```
 
-本版只要求使用者輸入 PPA 與 preference；FPS 僅為輸出指標。預設模型為已重算逐 block 大小的 ResNet-50 v1.5 FP32。硬體沿用附檔的 0815 power 與有效 0.3 bits/cycle 頻寬設定。
+本版只要求使用者輸入 PPA 與 preference；FPS 僅為輸出指標。預設模型為已重算逐 block 大小的 ResNet-50 v1.5 FP32。硬體沿用 0815 power；正式 link bandwidth 為 **256 bits/cycle/direction**。
 
 - [完整使用與實作檢查](simplified_rapidchiplet/0917_IMPLEMENTATION_REVIEW_zh-TW.md)
 - [回歸測試與多 seed 驗證](simplified_rapidchiplet/VALIDATION_0917_zh-TW.md)

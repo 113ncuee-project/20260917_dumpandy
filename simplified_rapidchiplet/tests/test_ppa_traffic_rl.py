@@ -170,7 +170,7 @@ class PpaTrafficRlTests(unittest.TestCase):
         cfg=load_config(ROOT/'configs/defaults.json')
         self.assertEqual((cfg.power.chiplet_static_w,cfg.power.chiplet_peak_dynamic_w,cfg.power.phy_w),(.15,.85,.03))
         self.assertEqual((cfg.power.link_static_w_per_mm,cfg.power.link_dynamic_pj_per_bit),(.005,.5))
-        self.assertEqual((cfg.chiplet.frequency_hz,cfg.network.link_bandwidth_bits_per_cycle),(200000000,.3))
+        self.assertEqual((cfg.chiplet.frequency_hz,cfg.network.link_bandwidth_bits_per_cycle),(200000000,256.))
         self.assertEqual((cfg.network.link_latency_base_cycles,cfg.network.link_latency_cycles_per_mm),(1.,.25))
         self.assertEqual(cfg.chiplet.sram_mb,16.)
         self.assertEqual(cfg.ppa,dict(max_latency_ns=500000000.,max_area_mm2=800.,max_power_w=16.))
@@ -287,15 +287,18 @@ class PpaTrafficRlTests(unittest.TestCase):
             return out
         with patch.object(rc,'rapidchiplet',side_effect=capture):
             a=evaluate_one(self.model,'mesh',2,official,workload=w)
-            changed=replace(official,network=replace(official.network,link_bandwidth_bits_per_cycle=.6),
+            changed=replace(official,network=replace(official.network,link_bandwidth_bits_per_cycle=512.),
                             power=replace(official.power,chiplet_static_w=.25))
             b=evaluate_one(self.model,'mesh',2,changed,workload=w)
         local=evaluate_one(self.model,'mesh',2,self.cfg,workload=w)
-        self.assertEqual(set(seen[0][1]['link_bandwidths'].values()),{.3})
-        self.assertEqual(set(seen[1][1]['link_bandwidths'].values()),{.6})
+        self.assertEqual(set(seen[0][1]['link_bandwidths'].values()),{256.})
+        self.assertEqual(set(seen[1][1]['link_bandwidths'].values()),{512.})
         self.assertAlmostEqual(a.total_chiplet_power_w,2*.8175)
         self.assertAlmostEqual(b.total_power_w-a.total_power_w,.2)
         self.assertAlmostEqual(b.network_limited_fps,2*a.network_limited_fps)
+        self.assertGreater(a.e2e_communication_serialization_ns, 0)
+        self.assertAlmostEqual(b.e2e_communication_serialization_ns,
+                               a.e2e_communication_serialization_ns / 2)
         for attr in ('total_power_w','network_limited_fps','rapid_avg_latency_ns','total_area_mm2'):
             self.assertAlmostEqual(getattr(a,attr),getattr(local,attr),msg=attr)
         self.assertFalse(seen[0][0]['packaging']['is_active'])

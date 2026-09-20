@@ -50,7 +50,7 @@ def main():
         records.append(record)
     out=ROOT/'validation/gui_multimodel_validation.json'
     out.write_text(json.dumps(dict(date=datetime.now().astimezone().date().isoformat(),execution='Real browser GUI jobs on local official RapidChiplet',
-        unit_tests=dict(passed=63,command='python -m unittest discover -s tests'),
+        unit_tests=dict(passed=67,command='python -m unittest discover -s tests'),
         note='CPU model forward validates graph metadata, not measured chiplet PPA or classification accuracy.',
         cases=records),ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     print(out)

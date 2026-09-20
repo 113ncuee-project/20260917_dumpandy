@@ -105,7 +105,7 @@ link latency = ceil(1 + 0.25 × link 長度) cycles
 
 0.03 W 是 0815 的每顆 aggregate PHY 項，不能又乘四。封裝為 passive；link 長度統一使用 chiplet 中心距離。`0.5 pJ/bit` 另輸出為每 inference 的 link dynamic energy，按 bit-hops 計算；依原固定 utilization power 定義，沒有借 FPS 把它改算成另一套 workload power。
 
-附檔的 **有效頻寬是 0.3 bits/cycle/direction = 0.06 Gbit/s**，其 `baseline` 才是 **256 bits/cycle = 51.2 Gbit/s**。預設保留 0.3 的 stress test，沒有私自切回 256；驗證工具會另外標示 256 的敏感度案例。
+正式預設頻寬為 **256 bits/cycle/direction = 51.2 Gbit/s**（200 MHz），由使用者確認。
 
 正式與本地引擎的回歸測試會改變 power 與頻寬，檢查每條 link 實際值、power 增量、吞吐量比例，以及 area／ICI latency／power／network FPS 一致性。`auto` 模式在正式引擎不存在時會警告並標示 `local`；要禁止 fallback，將 backend 設為 `official`。
 
@@ -116,7 +116,7 @@ python -m unittest discover -s tests
 python tools/validate_0917.py
 ```
 
-驗證結果另見 `VALIDATION_0917_zh-TW.md`。第二個命令要求正式 Rapid，執行三個 seed 的 0.3 頻寬搜尋與四種偏好的 256 頻寬比較，每次 128 個不同候選，並和相同預算、相同起始候選的 random search 對照。
+驗證工具使用正式 256 頻寬進行多 seed／偏好比較，與相同評估預算的 random search 對照。
 
 目前是解析架構模型：SRAM 採 resident weights 與保守 activation buffer 檢查；OC/IC compute efficiency 仍為假設值（0.95/0.85，再隨顆數調整），未以真實 accelerator 校準。Reduction 的加法計算時間未單獨列項，通訊量則已計入。spatial mapping 因缺 tile、halo 與 ownership metadata 已停用。沒有 DRAM streaming／memory latency、網路 queue 或 compute/communication overlap 模擬；DAG scheduler 可表達分支相依，但不做跨事件的完整網路排隊。主要 PPA latency 用串行事件相加，對有並行分支的 DAG 會較保守。
 

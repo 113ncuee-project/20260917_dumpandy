@@ -14,4 +14,4 @@
 python .\run.py --preference balanced --max-latency-ns 500000000 --max-area-mm2 800 --max-power-w 16
 ```
 
-設定檔為 `configs/defaults.json`。輸入只有 PPA 要求與 preference；FPS 僅在完成評估後輸出。預設是附檔指定的 0.3 bits/cycle 頻寬壓力實驗，不是 256 bits/cycle 的基準實驗。
+設定檔為 `configs/defaults.json`。輸入只有 PPA 要求與 preference；FPS 僅在完成評估後輸出。正式預設頻寬為 **256 bits/cycle/direction**，200 MHz 下每方向為 **51.2 Gbit/s**。
