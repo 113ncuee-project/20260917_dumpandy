@@ -1,0 +1,455 @@
+[
+  {
+    "bandwidth_bits_per_cycle": 0.3,
+    "preference": "balanced",
+    "seed": 20260919,
+    "backend": "official",
+    "evaluations": 128,
+    "episodes": 296,
+    "stopping_reason": "evaluation_budget",
+    "design_space_size": 20176298,
+    "global_optimum_certified": false,
+    "first_reward": -1.827709092651234,
+    "best_reward": -1.6885820019942814,
+    "policy_reward": -1.6885820019942814,
+    "policy_matches_best": true,
+    "replay_converged": true,
+    "random_evaluations": 128,
+    "random_best_reward": -1.731250839889685,
+    "ppa_feasible": false,
+    "violated_constraints": [
+      "latency"
+    ],
+    "architecture_feasible": true,
+    "latency_s": 1.6055590980673458,
+    "area_mm2": 712.5259085625046,
+    "power_w": 7.8943636187501465,
+    "fps_reported": 1.4285693182988566,
+    "groups": [
+      [
+        0,
+        8,
+        1
+      ],
+      [
+        8,
+        11,
+        2
+      ],
+      [
+        11,
+        14,
+        1
+      ],
+      [
+        14,
+        17,
+        4
+      ],
+      [
+        17,
+        18,
+        1
+      ]
+    ],
+    "mapping_strategies": [
+      "single",
+      "output_channel",
+      "single",
+      "output_channel",
+      "single"
+    ],
+    "learned_actions": 523,
+    "explore_steps": 625,
+    "exploit_steps": 960,
+    "explored_strategies": [
+      "input_channel",
+      "output_channel",
+      "single"
+    ]
+  },
+  {
+    "bandwidth_bits_per_cycle": 0.3,
+    "preference": "balanced",
+    "seed": 20260920,
+    "backend": "official",
+    "evaluations": 128,
+    "episodes": 944,
+    "stopping_reason": "evaluation_budget",
+    "design_space_size": 20176298,
+    "global_optimum_certified": false,
+    "first_reward": -1.827709092651234,
+    "best_reward": -1.8140818069193898,
+    "policy_reward": -1.8140818069193898,
+    "policy_matches_best": true,
+    "replay_converged": true,
+    "random_evaluations": 128,
+    "random_best_reward": -1.7886269870266682,
+    "ppa_feasible": false,
+    "violated_constraints": [
+      "latency",
+      "area"
+    ],
+    "architecture_feasible": true,
+    "latency_s": 2.5947491284761335,
+    "area_mm2": 951.3692037968816,
+    "power_w": 8.756602253645992,
+    "fps_reported": 0.86195639293415,
+    "groups": [
+      [
+        0,
+        8,
+        1
+      ],
+      [
+        8,
+        11,
+        2
+      ],
+      [
+        11,
+        14,
+        2
+      ],
+      [
+        14,
+        17,
+        4
+      ],
+      [
+        17,
+        18,
+        1
+      ]
+    ],
+    "mapping_strategies": [
+      "single",
+      "input_channel",
+      "output_channel",
+      "input_channel",
+      "single"
+    ],
+    "learned_actions": 533,
+    "explore_steps": 799,
+    "exploit_steps": 3252,
+    "explored_strategies": [
+      "input_channel",
+      "output_channel",
+      "single"
+    ]
+  },
+  {
+    "bandwidth_bits_per_cycle": 0.3,
+    "preference": "balanced",
+    "seed": 20260921,
+    "backend": "official",
+    "evaluations": 128,
+    "episodes": 269,
+    "stopping_reason": "evaluation_budget",
+    "design_space_size": 20176298,
+    "global_optimum_certified": false,
+    "first_reward": -1.827709092651234,
+    "best_reward": -1.7695919764325874,
+    "policy_reward": -1.7695919764325874,
+    "policy_matches_best": true,
+    "replay_converged": true,
+    "random_evaluations": 128,
+    "random_best_reward": -1.7692096865839764,
+    "ppa_feasible": false,
+    "violated_constraints": [
+      "latency",
+      "area"
+    ],
+    "architecture_feasible": true,
+    "latency_s": 2.0754575651212313,
+    "area_mm2": 951.3692037968816,
+    "power_w": 10.570556793229375,
+    "fps_reported": 1.1038437463412991,
+    "groups": [
+      [
+        0,
+        8,
+        1
+      ],
+      [
+        8,
+        10,
+        2
+      ],
+      [
+        10,
+        14,
+        4
+      ],
+      [
+        14,
+        17,
+        4
+      ],
+      [
+        17,
+        18,
+        1
+      ]
+    ],
+    "mapping_strategies": [
+      "single",
+      "input_channel",
+      "output_channel",
+      "output_channel",
+      "single"
+    ],
+    "learned_actions": 526,
+    "explore_steps": 628,
+    "exploit_steps": 778,
+    "explored_strategies": [
+      "input_channel",
+      "output_channel",
+      "single"
+    ]
+  },
+  {
+    "bandwidth_bits_per_cycle": 256.0,
+    "preference": "balanced",
+    "seed": 20260919,
+    "backend": "official",
+    "evaluations": 128,
+    "episodes": 1102,
+    "stopping_reason": "evaluation_budget",
+    "design_space_size": 20176298,
+    "global_optimum_certified": false,
+    "first_reward": 0.625575892507526,
+    "best_reward": 0.625575892507526,
+    "policy_reward": 0.625575892507526,
+    "policy_matches_best": true,
+    "replay_converged": true,
+    "random_evaluations": 128,
+    "random_best_reward": 0.625575892507526,
+    "ppa_feasible": true,
+    "violated_constraints": [],
+    "architecture_feasible": true,
+    "latency_s": 0.2057630526287493,
+    "area_mm2": 712.5259085625046,
+    "power_w": 7.8943636187501465,
+    "fps_reported": 8.192308038324915,
+    "groups": [
+      [
+        0,
+        9,
+        2
+      ],
+      [
+        9,
+        14,
+        2
+      ],
+      [
+        14,
+        17,
+        4
+      ],
+      [
+        17,
+        18,
+        1
+      ]
+    ],
+    "mapping_strategies": [
+      "output_channel",
+      "output_channel",
+      "output_channel",
+      "single"
+    ],
+    "learned_actions": 526,
+    "explore_steps": 800,
+    "exploit_steps": 3894,
+    "explored_strategies": [
+      "input_channel",
+      "output_channel",
+      "single"
+    ]
+  },
+  {
+    "bandwidth_bits_per_cycle": 256.0,
+    "preference": "latency",
+    "seed": 20260919,
+    "backend": "official",
+    "evaluations": 128,
+    "episodes": 1102,
+    "stopping_reason": "evaluation_budget",
+    "design_space_size": 20176298,
+    "global_optimum_certified": false,
+    "first_reward": 0.6813723186900571,
+    "best_reward": 0.6813723186900571,
+    "policy_reward": 0.6813723186900571,
+    "policy_matches_best": true,
+    "replay_converged": true,
+    "random_evaluations": 128,
+    "random_best_reward": 0.6813723186900571,
+    "ppa_feasible": true,
+    "violated_constraints": [],
+    "architecture_feasible": true,
+    "latency_s": 0.2057630526287493,
+    "area_mm2": 712.5259085625046,
+    "power_w": 7.8943636187501465,
+    "fps_reported": 8.192308038324915,
+    "groups": [
+      [
+        0,
+        9,
+        2
+      ],
+      [
+        9,
+        14,
+        2
+      ],
+      [
+        14,
+        17,
+        4
+      ],
+      [
+        17,
+        18,
+        1
+      ]
+    ],
+    "mapping_strategies": [
+      "output_channel",
+      "output_channel",
+      "output_channel",
+      "single"
+    ],
+    "learned_actions": 526,
+    "explore_steps": 800,
+    "exploit_steps": 3894,
+    "explored_strategies": [
+      "input_channel",
+      "output_channel",
+      "single"
+    ]
+  },
+  {
+    "bandwidth_bits_per_cycle": 256.0,
+    "preference": "area",
+    "seed": 20260919,
+    "backend": "official",
+    "evaluations": 128,
+    "episodes": 1102,
+    "stopping_reason": "evaluation_budget",
+    "design_space_size": 20176298,
+    "global_optimum_certified": false,
+    "first_reward": 0.5546255435124386,
+    "best_reward": 0.5546255435124386,
+    "policy_reward": 0.5546255435124386,
+    "policy_matches_best": true,
+    "replay_converged": true,
+    "random_evaluations": 128,
+    "random_best_reward": 0.5546255435124386,
+    "ppa_feasible": true,
+    "violated_constraints": [],
+    "architecture_feasible": true,
+    "latency_s": 0.2057630526287493,
+    "area_mm2": 712.5259085625046,
+    "power_w": 7.8943636187501465,
+    "fps_reported": 8.192308038324915,
+    "groups": [
+      [
+        0,
+        9,
+        2
+      ],
+      [
+        9,
+        14,
+        2
+      ],
+      [
+        14,
+        17,
+        4
+      ],
+      [
+        17,
+        18,
+        1
+      ]
+    ],
+    "mapping_strategies": [
+      "output_channel",
+      "output_channel",
+      "output_channel",
+      "single"
+    ],
+    "learned_actions": 526,
+    "explore_steps": 800,
+    "exploit_steps": 3894,
+    "explored_strategies": [
+      "input_channel",
+      "output_channel",
+      "single"
+    ]
+  },
+  {
+    "bandwidth_bits_per_cycle": 256.0,
+    "preference": "power",
+    "seed": 20260919,
+    "backend": "official",
+    "evaluations": 128,
+    "episodes": 1102,
+    "stopping_reason": "evaluation_budget",
+    "design_space_size": 20176298,
+    "global_optimum_certified": false,
+    "first_reward": 0.6557649976277936,
+    "best_reward": 0.6557649976277936,
+    "policy_reward": 0.6557649976277936,
+    "policy_matches_best": true,
+    "replay_converged": true,
+    "random_evaluations": 128,
+    "random_best_reward": 0.6557649976277936,
+    "ppa_feasible": true,
+    "violated_constraints": [],
+    "architecture_feasible": true,
+    "latency_s": 0.2057630526287493,
+    "area_mm2": 712.5259085625046,
+    "power_w": 7.8943636187501465,
+    "fps_reported": 8.192308038324915,
+    "groups": [
+      [
+        0,
+        9,
+        2
+      ],
+      [
+        9,
+        14,
+        2
+      ],
+      [
+        14,
+        17,
+        4
+      ],
+      [
+        17,
+        18,
+        1
+      ]
+    ],
+    "mapping_strategies": [
+      "output_channel",
+      "output_channel",
+      "output_channel",
+      "single"
+    ],
+    "learned_actions": 526,
+    "explore_steps": 800,
+    "exploit_steps": 3894,
+    "explored_strategies": [
+      "input_channel",
+      "output_channel",
+      "single"
+    ]
+  }
+]

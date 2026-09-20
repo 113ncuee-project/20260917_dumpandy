@@ -1,97 +1,26 @@
-# Simplified RapidChiplet
+# 0917 PPA-only Chiplet DSE
 
-Traditional Chinese guide: [README_zh-TW.md](README_zh-TW.md)
+**Windows classmates: download/extract the repository and double-click `Start Chiplet Lab.cmd` at its root, or `Start GUI.cmd` here.** No installed Python or Codex runtime is required. The first launch downloads pinned, SHA-256-verified Python and official RapidChiplet files into `.runtime`; subsequent launches work offline. See [portable setup](PORTABLE_PACKAGE_zh-TW.md).
 
-This folder contains a compact DNN chiplet exploration prototype. It sweeps
-model partitions and active chiplet counts on a mesh interconnect, then reports
-latency, area, power, FPS, and a normalized PPA score.
+[GUI 與多模型使用說明](GUI_GUIDE_zh-TW.md) · [先前實作檢查](0917_IMPLEMENTATION_REVIEW_zh-TW.md)
 
-The main evaluator uses only the Python standard library. If the official
-RapidChiplet project path in `configs/defaults.json` exists, the evaluator calls
-that engine for package/link metrics. If it does not exist, the evaluator falls
-back to the local proxy in `simple_rapidchiplet/rapid_proxy.py`, so teammates can
-still clone and run the simplified project directly.
+Run **`python gui.py`** (or double-click **Start GUI.cmd**) for the local GUI: independent hard/soft PPA switches, calibrated model selection, and actual chiplet placement / routed tensor flows. Directional preference weights are now **0.6 / 0.2 / 0.2**; balanced is equal.
 
-Latency semantics: `avg_latency_ns` is the canonical Batch=1 analytical
-end-to-end latency, computed as group compute time plus communication service
-time. Rapid's traffic-weighted ICI latency is retained separately as
-`rapid_avg_latency_ns` and is not used as the complete inference latency.
-
-## Quick Start
+The current entry point is tabular Q-learning over contiguous block groups, chiplet counts and OC/IC mapping strategies. User inputs are PPA limits and preference. FPS is a reported metric only.
 
 ```powershell
-cd .\simplified_rapidchiplet
-.\scripts\run_demo.ps1
+python .\run.py --preference balanced --max-latency-ns 500000000 --max-area-mm2 800 --max-power-w 16
 ```
 
-Or run Python directly:
+- Defaults: `configs/defaults.json`; calibrated workloads: ResNet-50 v1.5, ResNet-18, MobileNetV2 and SqueezeNet 1.1, batch 1, FP32. All four have actual CPU forward / shape / parameter / Conv+Linear MAC records in `validation/model_forward_validation.json`.
+- Hardware preserves the supplied 0815 values, including 0.8175 W per chiplet and the explicit **0.3 bits/cycle/direction** stress bandwidth. **256** is the reference bandwidth, not the active default.
+- The official Rapid engine receives generated inputs and explicit directed link bandwidths. The portable default is `root=../.runtime/rapidchiplet` relative to the config file and `backend=official`; the launcher prepares it automatically. No per-machine path is needed, and failed official imports do not silently fall back.
+- Results: `results/preference_dse/preference_search_summary.csv`, full JSON, and a configuration/source-hash manifest.
+- Failed strict PPA constraints exclude a design from both best candidate and policy delivery; no acceptable result means `best_candidate=null`. Unchecked constraints permit overshoot with explicit bonus/penalty. CLI: `--no-strict-latency`, `--no-strict-area`, `--no-strict-power`. A 128-evaluation search is not a global optimum certificate.
 
 ```powershell
-python .\run.py --models shufflenet_v2_x1_0 --ppa-goal balanced --workload-search pareto-dp --dp-top-k 12 --out .\results\demo
-```
-
-Outputs are written to the selected output folder:
-
-```text
-best.csv
-best.json
-summary.csv
-summary.json
-chiplet_results.csv
-report.html
-```
-
-Open `report.html` in a browser for the visual summary.
-
-## Defaults
-
-- models: all 6 entries in `configs/models.json` when `--models` is omitted
-- target FPS: `15`
-- available chiplets: up to `16`
-- chiplet capacity: `8 x 8` PEs at `200 MHz`
-- topology: `mesh` only
-- workload search: `pareto-dp` with `--dp-top-k 12` (use brute-force as an oracle for validation)
-- PPA goal: `balanced`
-
-The initial model catalog intentionally covers several CNN families instead of
-only ResNet-50:
-
-| Model | Block representation | Purpose |
-|---|---|---|
-| `resnet18` | legacy stage fallback | small residual baseline |
-| `resnet50` | semantic `Bottleneck` blocks | deeper residual network |
-| `shufflenet_v2_x1_0` | legacy stage fallback | lightweight channel-shuffle model |
-| `shufflenet_v2_x2_0` | legacy stage fallback | wider channel-shuffle model |
-| `mobilenet_v2` | semantic `InvertedResidual` blocks | depthwise-separable mobile model |
-| `efficientnet_b0` | semantic `MBConv` blocks | compound-scaled mobile model |
-
-These entries are analytical workload metadata in
-`configs/models.json`. They are deliberately dependency-free; the DSE engine
-does not need PyTorch or pretrained weights to compare partitioning, mapping,
-chiplet count, communication, and E2E latency. Pass one or more names to
-`--models`, or omit the option to run the complete six-model catalog.
-
-## Useful Commands
-
-```powershell
-python .\run.py --ppa-goal latency
-python .\run.py --ppa-goal area
-python .\run.py --ppa-goal power
-python .\run.py --workload-search pareto-dp --dp-top-k 0
-python .\run.py --target-fps 30 --ppa-goal balanced
 python -m unittest discover -s tests
+python tools/validate_0917.py
 ```
 
-## Edit Inputs
-
-Change chiplet, network, power, target FPS, and RapidChiplet assumptions in:
-
-```text
-configs/defaults.json
-```
-
-Change model workload assumptions in:
-
-```text
-configs/models.json
-```
+The validation script requires the official engine and compares matched-budget Q-learning and random search. Its current output is `multi_seed_comparison_v4.json`; older records retain the old scoring definition. EfficientNet/ShuffleNet entries and historical DP/presentation helpers remain prototypes. MobileNetV2 IC and within-Fire parallel mapping are deliberately masked until validated; see the GUI guide for supported traffic semantics.

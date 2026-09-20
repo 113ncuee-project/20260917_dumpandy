@@ -1,11 +1,10 @@
 from __future__ import annotations
 
 import importlib
-import json
 import math
 import sys
 import warnings
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
 
@@ -41,6 +40,8 @@ class RapidChipletMetrics:
     max_link_length_mm: float
     bottleneck_link: tuple[int, int] | None
     graph: dict[str, Any]
+    backend: str = "local"
+    effective_hardware: dict[str, Any] = field(default_factory=dict)
 
 
 def evaluate_with_rapidchiplet(
@@ -50,9 +51,13 @@ def evaluate_with_rapidchiplet(
     design_name: str,
 ) -> RapidChipletMetrics:
     global _LOCAL_PROXY_WARNED
+    if cfg.rapidchiplet.backend == "local":
+        return _evaluate_with_local_proxy(topology, workload, cfg)
     try:
         rc = _load_rapidchiplet_module(cfg.rapidchiplet.root)
     except (FileNotFoundError, ModuleNotFoundError, ImportError) as exc:
+        if cfg.rapidchiplet.backend == "official":
+            raise
         if not _LOCAL_PROXY_WARNED:
             warnings.warn(
                 f"Using local RapidChiplet proxy because the official engine is unavailable: {exc}",
@@ -62,34 +67,17 @@ def evaluate_with_rapidchiplet(
             _LOCAL_PROXY_WARNED = True
         return _evaluate_with_local_proxy(topology, workload, cfg)
 
-    packaging = _read_rapidchiplet_json(cfg.rapidchiplet.root, cfg.rapidchiplet.packaging_file)
-    technologies = _read_rapidchiplet_json(cfg.rapidchiplet.root, cfg.rapidchiplet.technology_file)
-    chiplets = _build_chiplets(cfg)
-    placement = _build_placement(topology, cfg)
-    rc_topology = _build_topology(topology)
-    routing_table = _build_splif_routing_table(topology.node_count, rc_topology)
-    traffic_by_chiplet = dict(workload.traffic_bits_per_inference)
-
-    inputs = {
-        "design": {
-            "design_name": design_name,
-            "technologies": "in-memory",
-            "chiplets": "in-memory",
-            "placement": "in-memory",
-            "topology": "in-memory",
-            "packaging": "in-memory",
-            "routing_table": "in-memory",
-            "traffic_by_chiplet": "in-memory",
-        },
-        "chiplets": chiplets,
-        "placement": placement,
-        "topology": rc_topology,
-        "packaging": packaging,
-        "technologies": technologies,
-        "routing_table": routing_table,
-        "traffic_by_chiplet": traffic_by_chiplet,
-    }
-    intermediates: dict[str, Any] = {}
+    inputs = build_effective_inputs(topology, workload, cfg, design_name)
+    packaging = inputs["packaging"]
+    rc_topology = inputs["topology"]
+    routing_table = inputs["routing_table"]
+    traffic_by_chiplet = inputs["traffic_by_chiplet"]
+    # Seed the supported intermediary instead of relying on an upstream JSON
+    # override extension. Both directions use the configured bits/cycle.
+    intermediates: dict[str, Any] = {"link_bandwidths": {
+        (("chiplet", a), ("chiplet", b)): cfg.network.link_bandwidth_bits_per_cycle
+        for e in topology.edges for a, b in ((e.a, e.b), (e.b, e.a))
+    }}
     do_compute = {metric: False for metric in rc.metrics}
     for metric in ("area_summary", "power_summary"):
         do_compute[metric] = True
@@ -140,6 +128,7 @@ def evaluate_with_rapidchiplet(
         max_link_length_mm=max(link_lengths_once, default=0.0),
         bottleneck_link=bottleneck_link,
         graph=_build_graph(topology, workload, rc_topology, link_lengths),
+        backend="official", effective_hardware=effective_hardware(cfg),
     )
 
 
@@ -168,7 +157,7 @@ def _evaluate_with_local_proxy(
     total_chiplet_area = topology.node_count * cfg.chiplet.width_mm * cfg.chiplet.width_mm
     total_area = _local_package_area(topology, cfg)
     total_chiplet_power = _local_chiplet_power(workload, cfg)
-    total_link_power = _local_link_power(topology, workload, throughput.saturation_fps, cfg)
+    total_link_power = _local_link_power(topology, cfg)
     aggregate_throughput_cycles = (
         throughput.aggregate_throughput_bits_per_second / cfg.chiplet.frequency_hz
         if math.isfinite(throughput.aggregate_throughput_bits_per_second)
@@ -196,6 +185,7 @@ def _evaluate_with_local_proxy(
         max_link_length_mm=max(link_lengths_once, default=0.0),
         bottleneck_link=throughput.bottleneck_link,
         graph=_build_local_graph(topology, workload),
+        backend="local", effective_hardware=effective_hardware(cfg),
     )
 
 
@@ -208,21 +198,47 @@ def _load_rapidchiplet_module(root: str):
     root_str = str(root_path)
     if root_str not in sys.path:
         sys.path.insert(0, root_str)
-    return importlib.import_module("rapidchiplet")
+    module = importlib.import_module("rapidchiplet")
+    if Path(module.__file__).resolve().parent != root_path.resolve():
+        raise ImportError("A different RapidChiplet root is already loaded; use a separate process")
+    return module
 
 
-def _read_rapidchiplet_json(root: str, relative_path: str) -> Any:
-    path = Path(root) / relative_path
-    with path.open("r", encoding="utf-8") as f:
-        return json.load(f)
+def chiplet_power_w(cfg):
+    # Same convention as the supplied 0815 adapter: one aggregate PHY term.
+    return cfg.power.chiplet_static_w + cfg.power.chiplet_peak_dynamic_w * cfg.chiplet.utilization + cfg.power.phy_w
 
 
-def _build_chiplets(cfg: EvalConfig) -> dict[str, Any]:
-    chiplets = _read_rapidchiplet_json(cfg.rapidchiplet.root, cfg.rapidchiplet.chiplet_file)
-    if cfg.rapidchiplet.chiplet_name not in chiplets:
-        known = ", ".join(sorted(chiplets))
-        raise KeyError(f"Unknown RapidChiplet chiplet '{cfg.rapidchiplet.chiplet_name}'. Known chiplets: {known}")
-    return chiplets
+def effective_hardware(cfg):
+    return dict(chiplet=asdict(cfg.chiplet), network=asdict(cfg.network), power=asdict(cfg.power),
+                chiplet_power_w=chiplet_power_w(cfg), packaging_is_active=False,
+                power_model="0815_fixed_utilization_plus_length_static_links",
+                dynamic_link_power_included=False,
+                link_geometry="chiplet_center_to_center", bandwidth_unit="bits/cycle/direction")
+
+
+def _build_chiplets(cfg):
+    width = cfg.chiplet.width_mm
+    return {cfg.rapidchiplet.chiplet_name: dict(
+        dimensions={"x": width, "y": width}, type="compute", relay=True,
+        phys=[dict(x=width / 2, y=width / 2, fraction_bump_area=.25) for _ in range(4)],
+        fraction_power_bumps=.5, technology="configured", power=chiplet_power_w(cfg),
+        internal_latency=cfg.chiplet.internal_latency_cycles, unit_count=1)}
+
+
+def build_effective_inputs(topology, workload, cfg, design_name="configured"):
+    packaging = dict(link_routing="euclidean", link_latency_type="function",
+        link_latency=f"lambda x: {cfg.network.link_latency_base_cycles!r} + {cfg.network.link_latency_cycles_per_mm!r} * x",
+        link_power_type="function", link_power=f"lambda x: {cfg.power.link_static_w_per_mm!r} * x",
+        packaging_yield=.9, bump_pitch=.05, non_data_wires=12, is_active=False,
+        latency_irouter=0, power_irouter=0, has_interposer=True, interposer_technology="configured")
+    links = _build_topology(topology)
+    values = dict(chiplets=_build_chiplets(cfg), placement=_build_placement(topology, cfg),
+        topology=links, packaging=packaging, technologies={"configured": {"phy_latency": cfg.chiplet.phy_latency_cycles}},
+        routing_table=_build_splif_routing_table(topology.node_count, links),
+        traffic_by_chiplet=dict(workload.traffic_bits_per_inference))
+    values["design"] = dict(design_name=design_name, **{k: "in-memory" for k in values})
+    return values
 
 
 def _build_placement(topology: Topology, cfg: EvalConfig) -> dict[str, Any]:
@@ -340,33 +356,12 @@ def _local_package_area(topology: Topology, cfg: EvalConfig) -> float:
     return _local_package_width(topology, cfg) * _local_package_height(topology, cfg)
 
 
-def _local_chiplet_power(workload: WorkloadPartition, cfg: EvalConfig) -> float:
-    max_ops = max(workload.ops_per_chiplet, default=0.0)
-    total = 0.0
-    for ops in workload.ops_per_chiplet:
-        relative_load = 0.0 if max_ops <= 0 else min(1.0, ops / max_ops)
-        total += cfg.power.chiplet_static_w
-        total += cfg.power.chiplet_peak_dynamic_w * cfg.chiplet.utilization * relative_load
-        total += 4 * cfg.power.phy_w
-    return total
+def _local_chiplet_power(workload, cfg):
+    return len(workload.ops_per_chiplet) * chiplet_power_w(cfg)
 
 
-def _local_link_power(
-    topology: Topology,
-    workload: WorkloadPartition,
-    saturation_fps: float,
-    cfg: EvalConfig,
-) -> float:
-    static_w = sum(edge.length_mm * cfg.power.link_static_w_per_mm for edge in topology.edges)
-    fps_for_dynamic = cfg.target_fps
-    if math.isfinite(saturation_fps):
-        fps_for_dynamic = min(cfg.target_fps, saturation_fps)
-    traffic_energy_j = (
-        workload.total_traffic_bits_per_inference
-        * cfg.power.link_dynamic_pj_per_bit
-        * 1e-12
-    )
-    return static_w + traffic_energy_j * fps_for_dynamic
+def _local_link_power(topology, cfg):
+    return sum(e.length_mm * cfg.power.link_static_w_per_mm for e in topology.edges)
 
 
 def _build_local_graph(topology: Topology, workload: WorkloadPartition) -> dict[str, Any]:

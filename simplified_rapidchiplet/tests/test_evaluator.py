@@ -4,10 +4,7 @@ from pathlib import Path
 
 from simple_rapidchiplet.config import load_config
 from simple_rapidchiplet.evaluator import (
-    _fps_bonus,
-    _fps_penalty,
     _score_results,
-    compute_only_chiplets,
     evaluate_models,
     evaluate_one,
     make_ppa_reference,
@@ -36,6 +33,20 @@ from simple_rapidchiplet.workload import (
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def legacy_fixture():
+    """Bounded six-stage fixture for legacy enumeration/refinement tests.
+
+    It intentionally keeps the historical synthetic stage abstraction; full
+    calibrated models are exercised through the bounded RL/GUI tests instead.
+    """
+    names = ("conv1", "layer1", "layer2", "layer3", "layer4", "fc")
+    macs = (.12, .42, .46, .45, .36, .01)
+    tensors = (3.06, .77, .38, .19, .05, .01)
+    return ModelSpec("legacy_fixture", "test", "synthetic", sum(macs), 11.7, tuple(
+        Stage(name, mac, out, (names[i-1],) if i else (), input_mb=tensors[i-1] if i else .574,
+              operators=(name,)) for i, (name, mac, out) in enumerate(zip(names, macs, tensors))))
+
+
 class EvaluatorTests(unittest.TestCase):
     def test_mesh_edge_count_for_four_chiplets(self):
         topology = make_topology("mesh", 4, chiplet_width_mm=8.6, spacing_mm=1.0)
@@ -54,21 +65,17 @@ class EvaluatorTests(unittest.TestCase):
         self.assertEqual(len(tree.edges), tree.node_count - 1)
         self.assertEqual([edge.key() for edge in tree.edges[:3]], [(0, 1), (0, 2), (1, 3)])
 
-    def test_resnet18_compute_only_chiplets_is_positive(self):
-        cfg = load_config(ROOT / "configs" / "defaults.json")
-        model = load_models(ROOT / "configs" / "models.json")["resnet18"]
-        self.assertGreater(compute_only_chiplets(model, cfg, target_fps=30), 1)
 
     def test_default_chiplet_capacity_is_eight_by_eight_with_sixteen_available(self):
         cfg = load_config(ROOT / "configs" / "defaults.json")
         self.assertEqual(cfg.chiplet.pe_rows, 8)
         self.assertEqual(cfg.chiplet.pe_cols, 8)
         self.assertEqual(cfg.max_chiplets, 16)
-        self.assertEqual(cfg.target_fps, 15)
+        self.assertFalse(hasattr(cfg, "target_fps"))
 
     def test_pareto_dp_generates_stage_partition_candidates(self):
         cfg = load_config(ROOT / "configs" / "defaults.json")
-        model = load_models(ROOT / "configs" / "models.json")["resnet18"]
+        model = legacy_fixture()
         workloads = pareto_dp_pipeline_workloads(model, 2, cfg.chiplet.op_per_mac)
         self.assertGreater(len(workloads), 1)
         self.assertTrue(all(len(workload.ops_per_chiplet) == 2 for workload in workloads))
@@ -105,21 +112,21 @@ class EvaluatorTests(unittest.TestCase):
 
     def test_brute_force_generates_stage_cut_candidates(self):
         cfg = load_config(ROOT / "configs" / "defaults.json")
-        model = load_models(ROOT / "configs" / "models.json")["resnet18"]
+        model = legacy_fixture()
         workloads = brute_force_pipeline_workloads(model, 4, cfg.chiplet.op_per_mac)
         plans = {workload.plan for workload in workloads}
         self.assertIn("conv1 + layer1 | layer2 | layer3 | layer4 + fc", plans)
 
     def test_brute_force_generates_single_stage_parallel_candidates(self):
         cfg = load_config(ROOT / "configs" / "defaults.json")
-        model = load_models(ROOT / "configs" / "models.json")["resnet18"]
+        model = legacy_fixture()
         workloads = brute_force_pipeline_workloads(model, 16, cfg.chiplet.op_per_mac)
         self.assertTrue(any("layer3[1/5]" in workload.plan for workload in workloads))
         self.assertTrue(all(workload.search_method == "brute-force" for workload in workloads))
 
     def test_brute_force_generates_multi_block_parallel_candidates(self):
         cfg = load_config(ROOT / "configs" / "defaults.json")
-        model = load_models(ROOT / "configs" / "models.json")["resnet18"]
+        model = legacy_fixture()
         workloads = brute_force_pipeline_workloads(model, 4, cfg.chiplet.op_per_mac)
         self.assertTrue(
             any(
@@ -130,7 +137,7 @@ class EvaluatorTests(unittest.TestCase):
         )
 
     def test_refined_model_exposes_a_finer_block_graph(self):
-        model = load_models(ROOT / "configs" / "models.json")["resnet18"]
+        model = legacy_fixture()
         refined = refine_model_blocks(model, split_factor=2)
         self.assertEqual(len(refined.blocks), 2 * len(model.blocks))
         self.assertAlmostEqual(sum(block.macs_g for block in refined.blocks), model.macs_g)
@@ -150,7 +157,7 @@ class EvaluatorTests(unittest.TestCase):
         self.assertEqual(extracted.block_graph()["kind"], "semantic_block_dag")
         self.assertAlmostEqual(sum(block.macs_g for block in extracted.blocks), model.macs_g, places=6)
 
-    def test_model_catalog_covers_six_cnn_families(self):
+    def test_model_catalog_covers_calibrated_and_legacy_models(self):
         models = load_models(ROOT / "configs" / "models.json")
         expected = {
             "resnet18",
@@ -159,6 +166,7 @@ class EvaluatorTests(unittest.TestCase):
             "shufflenet_v2_x2_0",
             "mobilenet_v2",
             "efficientnet_b0",
+            "squeezenet1_1",
         }
         self.assertEqual(set(models), expected)
         for model in models.values():
@@ -174,13 +182,13 @@ class EvaluatorTests(unittest.TestCase):
         efficientnet, efficientnet_report = extract_semantic_blocks(models["efficientnet_b0"])
         self.assertEqual(mobilenet_report.source, "semantic")
         self.assertEqual(efficientnet_report.source, "semantic")
-        self.assertIn("InvertedResidual", {block.block_type for block in mobilenet.blocks})
+        self.assertIn("inverted_residual", {block.block_type for block in mobilenet.blocks})
         self.assertIn("MBConv", {block.block_type for block in efficientnet.blocks})
         self.assertTrue(all(block.branch_closed for block in mobilenet.blocks + efficientnet.blocks))
 
     def test_direct_workload_allows_any_group_parallelism(self):
         cfg = load_config(ROOT / "configs" / "defaults.json")
-        model = load_models(ROOT / "configs" / "models.json")["resnet18"]
+        model = legacy_fixture()
         workload = build_pipeline_workload(
             model,
             cfg.chiplet.op_per_mac,
@@ -195,7 +203,7 @@ class EvaluatorTests(unittest.TestCase):
 
     def test_mapping_strategies_change_traffic_model(self):
         cfg = load_config(ROOT / "configs" / "defaults.json")
-        model = load_models(ROOT / "configs" / "models.json")["resnet18"]
+        model = legacy_fixture()
         groups = ((0, 1, 1), (1, 2, 4), (2, len(model.blocks), 1))
         output_split = build_pipeline_workload(
             model,
@@ -213,7 +221,7 @@ class EvaluatorTests(unittest.TestCase):
             output_split.mapping_plan["extra_traffic_mb"],
             input_split.mapping_plan["extra_traffic_mb"],
         )
-        self.assertIn("input_broadcast", str(output_split.mapping_plan))
+        self.assertIn("dependency_transfer", str(output_split.communication_events))
         self.assertIn("partial_output_reduction", str(input_split.mapping_plan))
 
     def test_feasibility_rejects_parallel_head(self):
@@ -264,7 +272,7 @@ class EvaluatorTests(unittest.TestCase):
     def test_single_candidate_has_power_and_latency(self):
         cfg = load_config(ROOT / "configs" / "defaults.json")
         model = load_models(ROOT / "configs" / "models.json")["shufflenet_v2_x1_0"]
-        result = evaluate_one(model, "mesh", chiplet_count=4, cfg=cfg, target_fps=30)
+        result = evaluate_one(model, "mesh", chiplet_count=4, cfg=cfg)
         self.assertGreater(result.total_power_w, 0)
         self.assertGreater(result.total_chiplet_power_w, 0)
         self.assertGreater(result.total_link_power_w, 0)
@@ -280,9 +288,10 @@ class EvaluatorTests(unittest.TestCase):
             rapidchiplet=replace(
                 cfg.rapidchiplet,
                 root=str(ROOT / "missing_rapidchiplet_root"),
+                backend="auto",
             ),
         )
-        model = load_models(ROOT / "configs" / "models.json")["resnet18"]
+        model = legacy_fixture()
         workload = build_pipeline_workload(
             model,
             cfg.chiplet.op_per_mac,
@@ -294,7 +303,6 @@ class EvaluatorTests(unittest.TestCase):
             "mesh",
             chiplet_count=4,
             cfg=cfg,
-            target_fps=1,
             workload=workload,
         )
 
@@ -317,42 +325,28 @@ class EvaluatorTests(unittest.TestCase):
         )
         self.assertEqual(
             result.e2e_path_latency_source,
-            "rapid_compatible_per_flow_splif_reconstruction",
+            "shared_tensor_events_configured_links_v1",
         )
 
     def test_local_proxy_runs_when_rapidchiplet_root_is_missing(self):
         cfg = load_config(ROOT / "configs" / "defaults.json")
         cfg = replace(
             cfg,
-            rapidchiplet=replace(cfg.rapidchiplet, root=str(ROOT / "missing_rapidchiplet_root")),
+            rapidchiplet=replace(cfg.rapidchiplet, root=str(ROOT / "missing_rapidchiplet_root"), backend="auto"),
         )
         model = load_models(ROOT / "configs" / "models.json")["shufflenet_v2_x1_0"]
-        result = evaluate_one(model, "mesh", chiplet_count=4, cfg=cfg, target_fps=30)
+        result = evaluate_one(model, "mesh", chiplet_count=4, cfg=cfg)
         self.assertGreater(result.total_power_w, 0)
         self.assertGreater(result.total_area_mm2, 0)
         self.assertGreater(result.avg_latency_ns, 0)
 
-    def test_low_target_does_not_force_all_chiplets(self):
-        cfg = load_config(ROOT / "configs" / "defaults.json")
-        model = load_models(ROOT / "configs" / "models.json")["shufflenet_v2_x1_0"]
-        summaries, _sweeps = evaluate_models([model], ["mesh"], cfg, target_fps=1, ppa_goal="area")
-        self.assertEqual(len(summaries), 1)
-        self.assertLess(summaries[0].selected_chiplets, cfg.max_chiplets)
-        self.assertGreater(summaries[0].unused_chiplets, 0)
 
-    def test_fps_penalty_is_soft_miss_ratio(self):
-        self.assertEqual(_fps_penalty(achieved_fps=15, target_fps=15), 0.0)
-        self.assertAlmostEqual(_fps_penalty(achieved_fps=12, target_fps=15), 0.2)
 
-    def test_fps_bonus_is_capped_excess_ratio(self):
-        self.assertEqual(_fps_bonus(achieved_fps=12, target_fps=15), 0.0)
-        self.assertAlmostEqual(_fps_bonus(achieved_fps=16.5, target_fps=15), 0.1)
-        self.assertAlmostEqual(_fps_bonus(achieved_fps=30, target_fps=15), 0.25)
 
     def test_shared_ppa_reference_gives_same_design_same_score(self):
         cfg = load_config(ROOT / "configs" / "defaults.json")
         model = load_models(ROOT / "configs" / "models.json")["shufflenet_v2_x1_0"]
-        result = evaluate_one(model, "mesh", chiplet_count=1, cfg=cfg, target_fps=15)
+        result = evaluate_one(model, "mesh", chiplet_count=1, cfg=cfg)
         reference = make_ppa_reference([result])
         weights = resolve_ppa_weights("balanced")
         first = _score_results([result], weights, reference)[0]
@@ -362,7 +356,7 @@ class EvaluatorTests(unittest.TestCase):
     def test_preference_reward_uses_user_direction(self):
         cfg = load_config(ROOT / "configs" / "defaults.json")
         model = load_models(ROOT / "configs" / "models.json")["shufflenet_v2_x1_0"]
-        baseline = evaluate_one(model, "mesh", 1, cfg, target_fps=1)
+        baseline = evaluate_one(model, "mesh", 1, cfg)
         low_latency = replace(
             baseline,
             avg_latency_ns=100.0,
@@ -371,7 +365,7 @@ class EvaluatorTests(unittest.TestCase):
         )
         low_area_power = replace(
             baseline,
-            avg_latency_ns=200.0,
+            avg_latency_ns=250.0,
             total_area_mm2=1_000.0,
             total_power_w=10.0,
         )
@@ -400,11 +394,11 @@ class EvaluatorTests(unittest.TestCase):
         area = make_preference_profile("area", cfg=cfg)
         power = make_preference_profile("power", cfg=cfg)
         balanced = make_preference_profile("balanced", cfg=cfg)
-        for actual, expected in zip(latency.weights, (0.8, 0.1, 0.1)):
+        for actual, expected in zip(latency.weights, (0.6, 0.2, 0.2)):
             self.assertAlmostEqual(actual, expected)
-        for actual, expected in zip(area.weights, (0.1, 0.8, 0.1)):
+        for actual, expected in zip(area.weights, (0.2, 0.6, 0.2)):
             self.assertAlmostEqual(actual, expected)
-        for actual, expected in zip(power.weights, (0.1, 0.1, 0.8)):
+        for actual, expected in zip(power.weights, (0.2, 0.2, 0.6)):
             self.assertAlmostEqual(actual, expected)
         for actual, expected in zip(balanced.weights, (1 / 3, 1 / 3, 1 / 3)):
             self.assertAlmostEqual(actual, expected)

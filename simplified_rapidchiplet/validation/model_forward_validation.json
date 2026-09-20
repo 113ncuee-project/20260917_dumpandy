@@ -1,0 +1,3488 @@
+[
+  {
+    "model": "resnet50",
+    "parameters": 25557032,
+    "fp32_weights_mib": 97.49234008789062,
+    "conv_linear_macs": 4089184256,
+    "blocks": 18,
+    "output_shape": [
+      1,
+      1000
+    ],
+    "output_finite": true,
+    "block_forward_matches_full_model": true,
+    "max_abs_difference": 0.0,
+    "calibration": {
+      "source": "https://docs.pytorch.org/vision/0.21/_modules/torchvision/models/resnet.html",
+      "torch": "2.6.0+cpu",
+      "torchvision": "0.21.0+cpu",
+      "input_shape": [
+        1,
+        3,
+        224,
+        224
+      ],
+      "dtype": "float32",
+      "weights": "none",
+      "macs_scope": "Conv2d and Linear only; grouped Conv divides by groups",
+      "accuracy_measured": false,
+      "forward_checked": true
+    },
+    "operator_records": [
+      {
+        "block": "stem",
+        "operators": [
+          {
+            "name": "0",
+            "kind": "conv",
+            "macs": 118013952,
+            "input_shape": [
+              1,
+              3,
+              224,
+              224
+            ],
+            "output_shape": [
+              1,
+              64,
+              112,
+              112
+            ],
+            "output_mib": 3.0625,
+            "in_channels": 3,
+            "out_channels": 64
+          }
+        ]
+      },
+      {
+        "block": "layer1.0",
+        "operators": [
+          {
+            "name": "conv1",
+            "kind": "conv",
+            "macs": 12845056,
+            "input_shape": [
+              1,
+              64,
+              56,
+              56
+            ],
+            "output_shape": [
+              1,
+              64,
+              56,
+              56
+            ],
+            "output_mib": 0.765625,
+            "in_channels": 64,
+            "out_channels": 64
+          },
+          {
+            "name": "conv2",
+            "kind": "conv",
+            "macs": 115605504,
+            "input_shape": [
+              1,
+              64,
+              56,
+              56
+            ],
+            "output_shape": [
+              1,
+              64,
+              56,
+              56
+            ],
+            "output_mib": 0.765625,
+            "in_channels": 64,
+            "out_channels": 64
+          },
+          {
+            "name": "conv3",
+            "kind": "conv",
+            "macs": 51380224,
+            "input_shape": [
+              1,
+              64,
+              56,
+              56
+            ],
+            "output_shape": [
+              1,
+              256,
+              56,
+              56
+            ],
+            "output_mib": 3.0625,
+            "in_channels": 64,
+            "out_channels": 256
+          },
+          {
+            "name": "downsample.0",
+            "kind": "conv",
+            "macs": 51380224,
+            "input_shape": [
+              1,
+              64,
+              56,
+              56
+            ],
+            "output_shape": [
+              1,
+              256,
+              56,
+              56
+            ],
+            "output_mib": 3.0625,
+            "in_channels": 64,
+            "out_channels": 256
+          }
+        ]
+      },
+      {
+        "block": "layer1.1",
+        "operators": [
+          {
+            "name": "conv1",
+            "kind": "conv",
+            "macs": 51380224,
+            "input_shape": [
+              1,
+              256,
+              56,
+              56
+            ],
+            "output_shape": [
+              1,
+              64,
+              56,
+              56
+            ],
+            "output_mib": 0.765625,
+            "in_channels": 256,
+            "out_channels": 64
+          },
+          {
+            "name": "conv2",
+            "kind": "conv",
+            "macs": 115605504,
+            "input_shape": [
+              1,
+              64,
+              56,
+              56
+            ],
+            "output_shape": [
+              1,
+              64,
+              56,
+              56
+            ],
+            "output_mib": 0.765625,
+            "in_channels": 64,
+            "out_channels": 64
+          },
+          {
+            "name": "conv3",
+            "kind": "conv",
+            "macs": 51380224,
+            "input_shape": [
+              1,
+              64,
+              56,
+              56
+            ],
+            "output_shape": [
+              1,
+              256,
+              56,
+              56
+            ],
+            "output_mib": 3.0625,
+            "in_channels": 64,
+            "out_channels": 256
+          }
+        ]
+      },
+      {
+        "block": "layer1.2",
+        "operators": [
+          {
+            "name": "conv1",
+            "kind": "conv",
+            "macs": 51380224,
+            "input_shape": [
+              1,
+              256,
+              56,
+              56
+            ],
+            "output_shape": [
+              1,
+              64,
+              56,
+              56
+            ],
+            "output_mib": 0.765625,
+            "in_channels": 256,
+            "out_channels": 64
+          },
+          {
+            "name": "conv2",
+            "kind": "conv",
+            "macs": 115605504,
+            "input_shape": [
+              1,
+              64,
+              56,
+              56
+            ],
+            "output_shape": [
+              1,
+              64,
+              56,
+              56
+            ],
+            "output_mib": 0.765625,
+            "in_channels": 64,
+            "out_channels": 64
+          },
+          {
+            "name": "conv3",
+            "kind": "conv",
+            "macs": 51380224,
+            "input_shape": [
+              1,
+              64,
+              56,
+              56
+            ],
+            "output_shape": [
+              1,
+              256,
+              56,
+              56
+            ],
+            "output_mib": 3.0625,
+            "in_channels": 64,
+            "out_channels": 256
+          }
+        ]
+      },
+      {
+        "block": "layer2.0",
+        "operators": [
+          {
+            "name": "conv1",
+            "kind": "conv",
+            "macs": 102760448,
+            "input_shape": [
+              1,
+              256,
+              56,
+              56
+            ],
+            "output_shape": [
+              1,
+              128,
+              56,
+              56
+            ],
+            "output_mib": 1.53125,
+            "in_channels": 256,
+            "out_channels": 128
+          },
+          {
+            "name": "conv2",
+            "kind": "conv",
+            "macs": 115605504,
+            "input_shape": [
+              1,
+              128,
+              56,
+              56
+            ],
+            "output_shape": [
+              1,
+              128,
+              28,
+              28
+            ],
+            "output_mib": 0.3828125,
+            "in_channels": 128,
+            "out_channels": 128
+          },
+          {
+            "name": "conv3",
+            "kind": "conv",
+            "macs": 51380224,
+            "input_shape": [
+              1,
+              128,
+              28,
+              28
+            ],
+            "output_shape": [
+              1,
+              512,
+              28,
+              28
+            ],
+            "output_mib": 1.53125,
+            "in_channels": 128,
+            "out_channels": 512
+          },
+          {
+            "name": "downsample.0",
+            "kind": "conv",
+            "macs": 102760448,
+            "input_shape": [
+              1,
+              256,
+              56,
+              56
+            ],
+            "output_shape": [
+              1,
+              512,
+              28,
+              28
+            ],
+            "output_mib": 1.53125,
+            "in_channels": 256,
+            "out_channels": 512
+          }
+        ]
+      },
+      {
+        "block": "layer2.1",
+        "operators": [
+          {
+            "name": "conv1",
+            "kind": "conv",
+            "macs": 51380224,
+            "input_shape": [
+              1,
+              512,
+              28,
+              28
+            ],
+            "output_shape": [
+              1,
+              128,
+              28,
+              28
+            ],
+            "output_mib": 0.3828125,
+            "in_channels": 512,
+            "out_channels": 128
+          },
+          {
+            "name": "conv2",
+            "kind": "conv",
+            "macs": 115605504,
+            "input_shape": [
+              1,
+              128,
+              28,
+              28
+            ],
+            "output_shape": [
+              1,
+              128,
+              28,
+              28
+            ],
+            "output_mib": 0.3828125,
+            "in_channels": 128,
+            "out_channels": 128
+          },
+          {
+            "name": "conv3",
+            "kind": "conv",
+            "macs": 51380224,
+            "input_shape": [
+              1,
+              128,
+              28,
+              28
+            ],
+            "output_shape": [
+              1,
+              512,
+              28,
+              28
+            ],
+            "output_mib": 1.53125,
+            "in_channels": 128,
+            "out_channels": 512
+          }
+        ]
+      },
+      {
+        "block": "layer2.2",
+        "operators": [
+          {
+            "name": "conv1",
+            "kind": "conv",
+            "macs": 51380224,
+            "input_shape": [
+              1,
+              512,
+              28,
+              28
+            ],
+            "output_shape": [
+              1,
+              128,
+              28,
+              28
+            ],
+            "output_mib": 0.3828125,
+            "in_channels": 512,
+            "out_channels": 128
+          },
+          {
+            "name": "conv2",
+            "kind": "conv",
+            "macs": 115605504,
+            "input_shape": [
+              1,
+              128,
+              28,
+              28
+            ],
+            "output_shape": [
+              1,
+              128,
+              28,
+              28
+            ],
+            "output_mib": 0.3828125,
+            "in_channels": 128,
+            "out_channels": 128
+          },
+          {
+            "name": "conv3",
+            "kind": "conv",
+            "macs": 51380224,
+            "input_shape": [
+              1,
+              128,
+              28,
+              28
+            ],
+            "output_shape": [
+              1,
+              512,
+              28,
+              28
+            ],
+            "output_mib": 1.53125,
+            "in_channels": 128,
+            "out_channels": 512
+          }
+        ]
+      },
+      {
+        "block": "layer2.3",
+        "operators": [
+          {
+            "name": "conv1",
+            "kind": "conv",
+            "macs": 51380224,
+            "input_shape": [
+              1,
+              512,
+              28,
+              28
+            ],
+            "output_shape": [
+              1,
+              128,
+              28,
+              28
+            ],
+            "output_mib": 0.3828125,
+            "in_channels": 512,
+            "out_channels": 128
+          },
+          {
+            "name": "conv2",
+            "kind": "conv",
+            "macs": 115605504,
+            "input_shape": [
+              1,
+              128,
+              28,
+              28
+            ],
+            "output_shape": [
+              1,
+              128,
+              28,
+              28
+            ],
+            "output_mib": 0.3828125,
+            "in_channels": 128,
+            "out_channels": 128
+          },
+          {
+            "name": "conv3",
+            "kind": "conv",
+            "macs": 51380224,
+            "input_shape": [
+              1,
+              128,
+              28,
+              28
+            ],
+            "output_shape": [
+              1,
+              512,
+              28,
+              28
+            ],
+            "output_mib": 1.53125,
+            "in_channels": 128,
+            "out_channels": 512
+          }
+        ]
+      },
+      {
+        "block": "layer3.0",
+        "operators": [
+          {
+            "name": "conv1",
+            "kind": "conv",
+            "macs": 102760448,
+            "input_shape": [
+              1,
+              512,
+              28,
+              28
+            ],
+            "output_shape": [
+              1,
+              256,
+              28,
+              28
+            ],
+            "output_mib": 0.765625,
+            "in_channels": 512,
+            "out_channels": 256
+          },
+          {
+            "name": "conv2",
+            "kind": "conv",
+            "macs": 115605504,
+            "input_shape": [
+              1,
+              256,
+              28,
+              28
+            ],
+            "output_shape": [
+              1,
+              256,
+              14,
+              14
+            ],
+            "output_mib": 0.19140625,
+            "in_channels": 256,
+            "out_channels": 256
+          },
+          {
+            "name": "conv3",
+            "kind": "conv",
+            "macs": 51380224,
+            "input_shape": [
+              1,
+              256,
+              14,
+              14
+            ],
+            "output_shape": [
+              1,
+              1024,
+              14,
+              14
+            ],
+            "output_mib": 0.765625,
+            "in_channels": 256,
+            "out_channels": 1024
+          },
+          {
+            "name": "downsample.0",
+            "kind": "conv",
+            "macs": 102760448,
+            "input_shape": [
+              1,
+              512,
+              28,
+              28
+            ],
+            "output_shape": [
+              1,
+              1024,
+              14,
+              14
+            ],
+            "output_mib": 0.765625,
+            "in_channels": 512,
+            "out_channels": 1024
+          }
+        ]
+      },
+      {
+        "block": "layer3.1",
+        "operators": [
+          {
+            "name": "conv1",
+            "kind": "conv",
+            "macs": 51380224,
+            "input_shape": [
+              1,
+              1024,
+              14,
+              14
+            ],
+            "output_shape": [
+              1,
+              256,
+              14,
+              14
+            ],
+            "output_mib": 0.19140625,
+            "in_channels": 1024,
+            "out_channels": 256
+          },
+          {
+            "name": "conv2",
+            "kind": "conv",
+            "macs": 115605504,
+            "input_shape": [
+              1,
+              256,
+              14,
+              14
+            ],
+            "output_shape": [
+              1,
+              256,
+              14,
+              14
+            ],
+            "output_mib": 0.19140625,
+            "in_channels": 256,
+            "out_channels": 256
+          },
+          {
+            "name": "conv3",
+            "kind": "conv",
+            "macs": 51380224,
+            "input_shape": [
+              1,
+              256,
+              14,
+              14
+            ],
+            "output_shape": [
+              1,
+              1024,
+              14,
+              14
+            ],
+            "output_mib": 0.765625,
+            "in_channels": 256,
+            "out_channels": 1024
+          }
+        ]
+      },
+      {
+        "block": "layer3.2",
+        "operators": [
+          {
+            "name": "conv1",
+            "kind": "conv",
+            "macs": 51380224,
+            "input_shape": [
+              1,
+              1024,
+              14,
+              14
+            ],
+            "output_shape": [
+              1,
+              256,
+              14,
+              14
+            ],
+            "output_mib": 0.19140625,
+            "in_channels": 1024,
+            "out_channels": 256
+          },
+          {
+            "name": "conv2",
+            "kind": "conv",
+            "macs": 115605504,
+            "input_shape": [
+              1,
+              256,
+              14,
+              14
+            ],
+            "output_shape": [
+              1,
+              256,
+              14,
+              14
+            ],
+            "output_mib": 0.19140625,
+            "in_channels": 256,
+            "out_channels": 256
+          },
+          {
+            "name": "conv3",
+            "kind": "conv",
+            "macs": 51380224,
+            "input_shape": [
+              1,
+              256,
+              14,
+              14
+            ],
+            "output_shape": [
+              1,
+              1024,
+              14,
+              14
+            ],
+            "output_mib": 0.765625,
+            "in_channels": 256,
+            "out_channels": 1024
+          }
+        ]
+      },
+      {
+        "block": "layer3.3",
+        "operators": [
+          {
+            "name": "conv1",
+            "kind": "conv",
+            "macs": 51380224,
+            "input_shape": [
+              1,
+              1024,
+              14,
+              14
+            ],
+            "output_shape": [
+              1,
+              256,
+              14,
+              14
+            ],
+            "output_mib": 0.19140625,
+            "in_channels": 1024,
+            "out_channels": 256
+          },
+          {
+            "name": "conv2",
+            "kind": "conv",
+            "macs": 115605504,
+            "input_shape": [
+              1,
+              256,
+              14,
+              14
+            ],
+            "output_shape": [
+              1,
+              256,
+              14,
+              14
+            ],
+            "output_mib": 0.19140625,
+            "in_channels": 256,
+            "out_channels": 256
+          },
+          {
+            "name": "conv3",
+            "kind": "conv",
+            "macs": 51380224,
+            "input_shape": [
+              1,
+              256,
+              14,
+              14
+            ],
+            "output_shape": [
+              1,
+              1024,
+              14,
+              14
+            ],
+            "output_mib": 0.765625,
+            "in_channels": 256,
+            "out_channels": 1024
+          }
+        ]
+      },
+      {
+        "block": "layer3.4",
+        "operators": [
+          {
+            "name": "conv1",
+            "kind": "conv",
+            "macs": 51380224,
+            "input_shape": [
+              1,
+              1024,
+              14,
+              14
+            ],
+            "output_shape": [
+              1,
+              256,
+              14,
+              14
+            ],
+            "output_mib": 0.19140625,
+            "in_channels": 1024,
+            "out_channels": 256
+          },
+          {
+            "name": "conv2",
+            "kind": "conv",
+            "macs": 115605504,
+            "input_shape": [
+              1,
+              256,
+              14,
+              14
+            ],
+            "output_shape": [
+              1,
+              256,
+              14,
+              14
+            ],
+            "output_mib": 0.19140625,
+            "in_channels": 256,
+            "out_channels": 256
+          },
+          {
+            "name": "conv3",
+            "kind": "conv",
+            "macs": 51380224,
+            "input_shape": [
+              1,
+              256,
+              14,
+              14
+            ],
+            "output_shape": [
+              1,
+              1024,
+              14,
+              14
+            ],
+            "output_mib": 0.765625,
+            "in_channels": 256,
+            "out_channels": 1024
+          }
+        ]
+      },
+      {
+        "block": "layer3.5",
+        "operators": [
+          {
+            "name": "conv1",
+            "kind": "conv",
+            "macs": 51380224,
+            "input_shape": [
+              1,
+              1024,
+              14,
+              14
+            ],
+            "output_shape": [
+              1,
+              256,
+              14,
+              14
+            ],
+            "output_mib": 0.19140625,
+            "in_channels": 1024,
+            "out_channels": 256
+          },
+          {
+            "name": "conv2",
+            "kind": "conv",
+            "macs": 115605504,
+            "input_shape": [
+              1,
+              256,
+              14,
+              14
+            ],
+            "output_shape": [
+              1,
+              256,
+              14,
+              14
+            ],
+            "output_mib": 0.19140625,
+            "in_channels": 256,
+            "out_channels": 256
+          },
+          {
+            "name": "conv3",
+            "kind": "conv",
+            "macs": 51380224,
+            "input_shape": [
+              1,
+              256,
+              14,
+              14
+            ],
+            "output_shape": [
+              1,
+              1024,
+              14,
+              14
+            ],
+            "output_mib": 0.765625,
+            "in_channels": 256,
+            "out_channels": 1024
+          }
+        ]
+      },
+      {
+        "block": "layer4.0",
+        "operators": [
+          {
+            "name": "conv1",
+            "kind": "conv",
+            "macs": 102760448,
+            "input_shape": [
+              1,
+              1024,
+              14,
+              14
+            ],
+            "output_shape": [
+              1,
+              512,
+              14,
+              14
+            ],
+            "output_mib": 0.3828125,
+            "in_channels": 1024,
+            "out_channels": 512
+          },
+          {
+            "name": "conv2",
+            "kind": "conv",
+            "macs": 115605504,
+            "input_shape": [
+              1,
+              512,
+              14,
+              14
+            ],
+            "output_shape": [
+              1,
+              512,
+              7,
+              7
+            ],
+            "output_mib": 0.095703125,
+            "in_channels": 512,
+            "out_channels": 512
+          },
+          {
+            "name": "conv3",
+            "kind": "conv",
+            "macs": 51380224,
+            "input_shape": [
+              1,
+              512,
+              7,
+              7
+            ],
+            "output_shape": [
+              1,
+              2048,
+              7,
+              7
+            ],
+            "output_mib": 0.3828125,
+            "in_channels": 512,
+            "out_channels": 2048
+          },
+          {
+            "name": "downsample.0",
+            "kind": "conv",
+            "macs": 102760448,
+            "input_shape": [
+              1,
+              1024,
+              14,
+              14
+            ],
+            "output_shape": [
+              1,
+              2048,
+              7,
+              7
+            ],
+            "output_mib": 0.3828125,
+            "in_channels": 1024,
+            "out_channels": 2048
+          }
+        ]
+      },
+      {
+        "block": "layer4.1",
+        "operators": [
+          {
+            "name": "conv1",
+            "kind": "conv",
+            "macs": 51380224,
+            "input_shape": [
+              1,
+              2048,
+              7,
+              7
+            ],
+            "output_shape": [
+              1,
+              512,
+              7,
+              7
+            ],
+            "output_mib": 0.095703125,
+            "in_channels": 2048,
+            "out_channels": 512
+          },
+          {
+            "name": "conv2",
+            "kind": "conv",
+            "macs": 115605504,
+            "input_shape": [
+              1,
+              512,
+              7,
+              7
+            ],
+            "output_shape": [
+              1,
+              512,
+              7,
+              7
+            ],
+            "output_mib": 0.095703125,
+            "in_channels": 512,
+            "out_channels": 512
+          },
+          {
+            "name": "conv3",
+            "kind": "conv",
+            "macs": 51380224,
+            "input_shape": [
+              1,
+              512,
+              7,
+              7
+            ],
+            "output_shape": [
+              1,
+              2048,
+              7,
+              7
+            ],
+            "output_mib": 0.3828125,
+            "in_channels": 512,
+            "out_channels": 2048
+          }
+        ]
+      },
+      {
+        "block": "layer4.2",
+        "operators": [
+          {
+            "name": "conv1",
+            "kind": "conv",
+            "macs": 51380224,
+            "input_shape": [
+              1,
+              2048,
+              7,
+              7
+            ],
+            "output_shape": [
+              1,
+              512,
+              7,
+              7
+            ],
+            "output_mib": 0.095703125,
+            "in_channels": 2048,
+            "out_channels": 512
+          },
+          {
+            "name": "conv2",
+            "kind": "conv",
+            "macs": 115605504,
+            "input_shape": [
+              1,
+              512,
+              7,
+              7
+            ],
+            "output_shape": [
+              1,
+              512,
+              7,
+              7
+            ],
+            "output_mib": 0.095703125,
+            "in_channels": 512,
+            "out_channels": 512
+          },
+          {
+            "name": "conv3",
+            "kind": "conv",
+            "macs": 51380224,
+            "input_shape": [
+              1,
+              512,
+              7,
+              7
+            ],
+            "output_shape": [
+              1,
+              2048,
+              7,
+              7
+            ],
+            "output_mib": 0.3828125,
+            "in_channels": 512,
+            "out_channels": 2048
+          }
+        ]
+      },
+      {
+        "block": "head",
+        "operators": [
+          {
+            "name": "2",
+            "kind": "linear",
+            "macs": 2048000,
+            "input_shape": [
+              1,
+              2048
+            ],
+            "output_shape": [
+              1,
+              1000
+            ],
+            "output_mib": 0.003814697265625,
+            "in_channels": 2048,
+            "out_channels": 1000
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "model": "resnet18",
+    "parameters": 11689512,
+    "fp32_weights_mib": 44.591949462890625,
+    "conv_linear_macs": 1814073344,
+    "blocks": 10,
+    "output_shape": [
+      1,
+      1000
+    ],
+    "output_finite": true,
+    "block_forward_matches_full_model": true,
+    "max_abs_difference": 0.0,
+    "calibration": {
+      "source": "https://docs.pytorch.org/vision/0.21/_modules/torchvision/models/resnet.html",
+      "torch": "2.6.0+cpu",
+      "torchvision": "0.21.0+cpu",
+      "input_shape": [
+        1,
+        3,
+        224,
+        224
+      ],
+      "dtype": "float32",
+      "weights": "none",
+      "macs_scope": "Conv2d and Linear only; grouped Conv divides by groups",
+      "accuracy_measured": false,
+      "forward_checked": true
+    },
+    "operator_records": [
+      {
+        "block": "stem",
+        "operators": [
+          {
+            "name": "0",
+            "kind": "conv",
+            "macs": 118013952,
+            "input_shape": [
+              1,
+              3,
+              224,
+              224
+            ],
+            "output_shape": [
+              1,
+              64,
+              112,
+              112
+            ],
+            "output_mib": 3.0625,
+            "in_channels": 3,
+            "out_channels": 64
+          }
+        ]
+      },
+      {
+        "block": "layer1.0",
+        "operators": [
+          {
+            "name": "conv1",
+            "kind": "conv",
+            "macs": 115605504,
+            "input_shape": [
+              1,
+              64,
+              56,
+              56
+            ],
+            "output_shape": [
+              1,
+              64,
+              56,
+              56
+            ],
+            "output_mib": 0.765625,
+            "in_channels": 64,
+            "out_channels": 64
+          },
+          {
+            "name": "conv2",
+            "kind": "conv",
+            "macs": 115605504,
+            "input_shape": [
+              1,
+              64,
+              56,
+              56
+            ],
+            "output_shape": [
+              1,
+              64,
+              56,
+              56
+            ],
+            "output_mib": 0.765625,
+            "in_channels": 64,
+            "out_channels": 64
+          }
+        ]
+      },
+      {
+        "block": "layer1.1",
+        "operators": [
+          {
+            "name": "conv1",
+            "kind": "conv",
+            "macs": 115605504,
+            "input_shape": [
+              1,
+              64,
+              56,
+              56
+            ],
+            "output_shape": [
+              1,
+              64,
+              56,
+              56
+            ],
+            "output_mib": 0.765625,
+            "in_channels": 64,
+            "out_channels": 64
+          },
+          {
+            "name": "conv2",
+            "kind": "conv",
+            "macs": 115605504,
+            "input_shape": [
+              1,
+              64,
+              56,
+              56
+            ],
+            "output_shape": [
+              1,
+              64,
+              56,
+              56
+            ],
+            "output_mib": 0.765625,
+            "in_channels": 64,
+            "out_channels": 64
+          }
+        ]
+      },
+      {
+        "block": "layer2.0",
+        "operators": [
+          {
+            "name": "conv1",
+            "kind": "conv",
+            "macs": 57802752,
+            "input_shape": [
+              1,
+              64,
+              56,
+              56
+            ],
+            "output_shape": [
+              1,
+              128,
+              28,
+              28
+            ],
+            "output_mib": 0.3828125,
+            "in_channels": 64,
+            "out_channels": 128
+          },
+          {
+            "name": "conv2",
+            "kind": "conv",
+            "macs": 115605504,
+            "input_shape": [
+              1,
+              128,
+              28,
+              28
+            ],
+            "output_shape": [
+              1,
+              128,
+              28,
+              28
+            ],
+            "output_mib": 0.3828125,
+            "in_channels": 128,
+            "out_channels": 128
+          },
+          {
+            "name": "downsample.0",
+            "kind": "conv",
+            "macs": 6422528,
+            "input_shape": [
+              1,
+              64,
+              56,
+              56
+            ],
+            "output_shape": [
+              1,
+              128,
+              28,
+              28
+            ],
+            "output_mib": 0.3828125,
+            "in_channels": 64,
+            "out_channels": 128
+          }
+        ]
+      },
+      {
+        "block": "layer2.1",
+        "operators": [
+          {
+            "name": "conv1",
+            "kind": "conv",
+            "macs": 115605504,
+            "input_shape": [
+              1,
+              128,
+              28,
+              28
+            ],
+            "output_shape": [
+              1,
+              128,
+              28,
+              28
+            ],
+            "output_mib": 0.3828125,
+            "in_channels": 128,
+            "out_channels": 128
+          },
+          {
+            "name": "conv2",
+            "kind": "conv",
+            "macs": 115605504,
+            "input_shape": [
+              1,
+              128,
+              28,
+              28
+            ],
+            "output_shape": [
+              1,
+              128,
+              28,
+              28
+            ],
+            "output_mib": 0.3828125,
+            "in_channels": 128,
+            "out_channels": 128
+          }
+        ]
+      },
+      {
+        "block": "layer3.0",
+        "operators": [
+          {
+            "name": "conv1",
+            "kind": "conv",
+            "macs": 57802752,
+            "input_shape": [
+              1,
+              128,
+              28,
+              28
+            ],
+            "output_shape": [
+              1,
+              256,
+              14,
+              14
+            ],
+            "output_mib": 0.19140625,
+            "in_channels": 128,
+            "out_channels": 256
+          },
+          {
+            "name": "conv2",
+            "kind": "conv",
+            "macs": 115605504,
+            "input_shape": [
+              1,
+              256,
+              14,
+              14
+            ],
+            "output_shape": [
+              1,
+              256,
+              14,
+              14
+            ],
+            "output_mib": 0.19140625,
+            "in_channels": 256,
+            "out_channels": 256
+          },
+          {
+            "name": "downsample.0",
+            "kind": "conv",
+            "macs": 6422528,
+            "input_shape": [
+              1,
+              128,
+              28,
+              28
+            ],
+            "output_shape": [
+              1,
+              256,
+              14,
+              14
+            ],
+            "output_mib": 0.19140625,
+            "in_channels": 128,
+            "out_channels": 256
+          }
+        ]
+      },
+      {
+        "block": "layer3.1",
+        "operators": [
+          {
+            "name": "conv1",
+            "kind": "conv",
+            "macs": 115605504,
+            "input_shape": [
+              1,
+              256,
+              14,
+              14
+            ],
+            "output_shape": [
+              1,
+              256,
+              14,
+              14
+            ],
+            "output_mib": 0.19140625,
+            "in_channels": 256,
+            "out_channels": 256
+          },
+          {
+            "name": "conv2",
+            "kind": "conv",
+            "macs": 115605504,
+            "input_shape": [
+              1,
+              256,
+              14,
+              14
+            ],
+            "output_shape": [
+              1,
+              256,
+              14,
+              14
+            ],
+            "output_mib": 0.19140625,
+            "in_channels": 256,
+            "out_channels": 256
+          }
+        ]
+      },
+      {
+        "block": "layer4.0",
+        "operators": [
+          {
+            "name": "conv1",
+            "kind": "conv",
+            "macs": 57802752,
+            "input_shape": [
+              1,
+              256,
+              14,
+              14
+            ],
+            "output_shape": [
+              1,
+              512,
+              7,
+              7
+            ],
+            "output_mib": 0.095703125,
+            "in_channels": 256,
+            "out_channels": 512
+          },
+          {
+            "name": "conv2",
+            "kind": "conv",
+            "macs": 115605504,
+            "input_shape": [
+              1,
+              512,
+              7,
+              7
+            ],
+            "output_shape": [
+              1,
+              512,
+              7,
+              7
+            ],
+            "output_mib": 0.095703125,
+            "in_channels": 512,
+            "out_channels": 512
+          },
+          {
+            "name": "downsample.0",
+            "kind": "conv",
+            "macs": 6422528,
+            "input_shape": [
+              1,
+              256,
+              14,
+              14
+            ],
+            "output_shape": [
+              1,
+              512,
+              7,
+              7
+            ],
+            "output_mib": 0.095703125,
+            "in_channels": 256,
+            "out_channels": 512
+          }
+        ]
+      },
+      {
+        "block": "layer4.1",
+        "operators": [
+          {
+            "name": "conv1",
+            "kind": "conv",
+            "macs": 115605504,
+            "input_shape": [
+              1,
+              512,
+              7,
+              7
+            ],
+            "output_shape": [
+              1,
+              512,
+              7,
+              7
+            ],
+            "output_mib": 0.095703125,
+            "in_channels": 512,
+            "out_channels": 512
+          },
+          {
+            "name": "conv2",
+            "kind": "conv",
+            "macs": 115605504,
+            "input_shape": [
+              1,
+              512,
+              7,
+              7
+            ],
+            "output_shape": [
+              1,
+              512,
+              7,
+              7
+            ],
+            "output_mib": 0.095703125,
+            "in_channels": 512,
+            "out_channels": 512
+          }
+        ]
+      },
+      {
+        "block": "head",
+        "operators": [
+          {
+            "name": "2",
+            "kind": "linear",
+            "macs": 512000,
+            "input_shape": [
+              1,
+              512
+            ],
+            "output_shape": [
+              1,
+              1000
+            ],
+            "output_mib": 0.003814697265625,
+            "in_channels": 512,
+            "out_channels": 1000
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "model": "mobilenet_v2",
+    "parameters": 3504872,
+    "fp32_weights_mib": 13.370025634765625,
+    "conv_linear_macs": 300774272,
+    "blocks": 20,
+    "output_shape": [
+      1,
+      1000
+    ],
+    "output_finite": true,
+    "block_forward_matches_full_model": true,
+    "max_abs_difference": 0.0,
+    "calibration": {
+      "source": "https://docs.pytorch.org/vision/0.21/_modules/torchvision/models/mobilenetv2.html",
+      "torch": "2.6.0+cpu",
+      "torchvision": "0.21.0+cpu",
+      "input_shape": [
+        1,
+        3,
+        224,
+        224
+      ],
+      "dtype": "float32",
+      "weights": "none",
+      "macs_scope": "Conv2d and Linear only; grouped Conv divides by groups",
+      "accuracy_measured": false,
+      "forward_checked": true
+    },
+    "operator_records": [
+      {
+        "block": "features.0",
+        "operators": [
+          {
+            "name": "0",
+            "kind": "conv",
+            "macs": 10838016,
+            "input_shape": [
+              1,
+              3,
+              224,
+              224
+            ],
+            "output_shape": [
+              1,
+              32,
+              112,
+              112
+            ],
+            "output_mib": 1.53125,
+            "in_channels": 3,
+            "out_channels": 32
+          }
+        ]
+      },
+      {
+        "block": "features.1",
+        "operators": [
+          {
+            "name": "conv.0.0",
+            "kind": "depthwise",
+            "macs": 3612672,
+            "input_shape": [
+              1,
+              32,
+              112,
+              112
+            ],
+            "output_shape": [
+              1,
+              32,
+              112,
+              112
+            ],
+            "output_mib": 1.53125,
+            "in_channels": 32,
+            "out_channels": 32
+          },
+          {
+            "name": "conv.1",
+            "kind": "conv",
+            "macs": 6422528,
+            "input_shape": [
+              1,
+              32,
+              112,
+              112
+            ],
+            "output_shape": [
+              1,
+              16,
+              112,
+              112
+            ],
+            "output_mib": 0.765625,
+            "in_channels": 32,
+            "out_channels": 16
+          }
+        ]
+      },
+      {
+        "block": "features.2",
+        "operators": [
+          {
+            "name": "conv.0.0",
+            "kind": "conv",
+            "macs": 19267584,
+            "input_shape": [
+              1,
+              16,
+              112,
+              112
+            ],
+            "output_shape": [
+              1,
+              96,
+              112,
+              112
+            ],
+            "output_mib": 4.59375,
+            "in_channels": 16,
+            "out_channels": 96
+          },
+          {
+            "name": "conv.1.0",
+            "kind": "depthwise",
+            "macs": 2709504,
+            "input_shape": [
+              1,
+              96,
+              112,
+              112
+            ],
+            "output_shape": [
+              1,
+              96,
+              56,
+              56
+            ],
+            "output_mib": 1.1484375,
+            "in_channels": 96,
+            "out_channels": 96
+          },
+          {
+            "name": "conv.2",
+            "kind": "conv",
+            "macs": 7225344,
+            "input_shape": [
+              1,
+              96,
+              56,
+              56
+            ],
+            "output_shape": [
+              1,
+              24,
+              56,
+              56
+            ],
+            "output_mib": 0.287109375,
+            "in_channels": 96,
+            "out_channels": 24
+          }
+        ]
+      },
+      {
+        "block": "features.3",
+        "operators": [
+          {
+            "name": "conv.0.0",
+            "kind": "conv",
+            "macs": 10838016,
+            "input_shape": [
+              1,
+              24,
+              56,
+              56
+            ],
+            "output_shape": [
+              1,
+              144,
+              56,
+              56
+            ],
+            "output_mib": 1.72265625,
+            "in_channels": 24,
+            "out_channels": 144
+          },
+          {
+            "name": "conv.1.0",
+            "kind": "depthwise",
+            "macs": 4064256,
+            "input_shape": [
+              1,
+              144,
+              56,
+              56
+            ],
+            "output_shape": [
+              1,
+              144,
+              56,
+              56
+            ],
+            "output_mib": 1.72265625,
+            "in_channels": 144,
+            "out_channels": 144
+          },
+          {
+            "name": "conv.2",
+            "kind": "conv",
+            "macs": 10838016,
+            "input_shape": [
+              1,
+              144,
+              56,
+              56
+            ],
+            "output_shape": [
+              1,
+              24,
+              56,
+              56
+            ],
+            "output_mib": 0.287109375,
+            "in_channels": 144,
+            "out_channels": 24
+          }
+        ]
+      },
+      {
+        "block": "features.4",
+        "operators": [
+          {
+            "name": "conv.0.0",
+            "kind": "conv",
+            "macs": 10838016,
+            "input_shape": [
+              1,
+              24,
+              56,
+              56
+            ],
+            "output_shape": [
+              1,
+              144,
+              56,
+              56
+            ],
+            "output_mib": 1.72265625,
+            "in_channels": 24,
+            "out_channels": 144
+          },
+          {
+            "name": "conv.1.0",
+            "kind": "depthwise",
+            "macs": 1016064,
+            "input_shape": [
+              1,
+              144,
+              56,
+              56
+            ],
+            "output_shape": [
+              1,
+              144,
+              28,
+              28
+            ],
+            "output_mib": 0.4306640625,
+            "in_channels": 144,
+            "out_channels": 144
+          },
+          {
+            "name": "conv.2",
+            "kind": "conv",
+            "macs": 3612672,
+            "input_shape": [
+              1,
+              144,
+              28,
+              28
+            ],
+            "output_shape": [
+              1,
+              32,
+              28,
+              28
+            ],
+            "output_mib": 0.095703125,
+            "in_channels": 144,
+            "out_channels": 32
+          }
+        ]
+      },
+      {
+        "block": "features.5",
+        "operators": [
+          {
+            "name": "conv.0.0",
+            "kind": "conv",
+            "macs": 4816896,
+            "input_shape": [
+              1,
+              32,
+              28,
+              28
+            ],
+            "output_shape": [
+              1,
+              192,
+              28,
+              28
+            ],
+            "output_mib": 0.57421875,
+            "in_channels": 32,
+            "out_channels": 192
+          },
+          {
+            "name": "conv.1.0",
+            "kind": "depthwise",
+            "macs": 1354752,
+            "input_shape": [
+              1,
+              192,
+              28,
+              28
+            ],
+            "output_shape": [
+              1,
+              192,
+              28,
+              28
+            ],
+            "output_mib": 0.57421875,
+            "in_channels": 192,
+            "out_channels": 192
+          },
+          {
+            "name": "conv.2",
+            "kind": "conv",
+            "macs": 4816896,
+            "input_shape": [
+              1,
+              192,
+              28,
+              28
+            ],
+            "output_shape": [
+              1,
+              32,
+              28,
+              28
+            ],
+            "output_mib": 0.095703125,
+            "in_channels": 192,
+            "out_channels": 32
+          }
+        ]
+      },
+      {
+        "block": "features.6",
+        "operators": [
+          {
+            "name": "conv.0.0",
+            "kind": "conv",
+            "macs": 4816896,
+            "input_shape": [
+              1,
+              32,
+              28,
+              28
+            ],
+            "output_shape": [
+              1,
+              192,
+              28,
+              28
+            ],
+            "output_mib": 0.57421875,
+            "in_channels": 32,
+            "out_channels": 192
+          },
+          {
+            "name": "conv.1.0",
+            "kind": "depthwise",
+            "macs": 1354752,
+            "input_shape": [
+              1,
+              192,
+              28,
+              28
+            ],
+            "output_shape": [
+              1,
+              192,
+              28,
+              28
+            ],
+            "output_mib": 0.57421875,
+            "in_channels": 192,
+            "out_channels": 192
+          },
+          {
+            "name": "conv.2",
+            "kind": "conv",
+            "macs": 4816896,
+            "input_shape": [
+              1,
+              192,
+              28,
+              28
+            ],
+            "output_shape": [
+              1,
+              32,
+              28,
+              28
+            ],
+            "output_mib": 0.095703125,
+            "in_channels": 192,
+            "out_channels": 32
+          }
+        ]
+      },
+      {
+        "block": "features.7",
+        "operators": [
+          {
+            "name": "conv.0.0",
+            "kind": "conv",
+            "macs": 4816896,
+            "input_shape": [
+              1,
+              32,
+              28,
+              28
+            ],
+            "output_shape": [
+              1,
+              192,
+              28,
+              28
+            ],
+            "output_mib": 0.57421875,
+            "in_channels": 32,
+            "out_channels": 192
+          },
+          {
+            "name": "conv.1.0",
+            "kind": "depthwise",
+            "macs": 338688,
+            "input_shape": [
+              1,
+              192,
+              28,
+              28
+            ],
+            "output_shape": [
+              1,
+              192,
+              14,
+              14
+            ],
+            "output_mib": 0.1435546875,
+            "in_channels": 192,
+            "out_channels": 192
+          },
+          {
+            "name": "conv.2",
+            "kind": "conv",
+            "macs": 2408448,
+            "input_shape": [
+              1,
+              192,
+              14,
+              14
+            ],
+            "output_shape": [
+              1,
+              64,
+              14,
+              14
+            ],
+            "output_mib": 0.0478515625,
+            "in_channels": 192,
+            "out_channels": 64
+          }
+        ]
+      },
+      {
+        "block": "features.8",
+        "operators": [
+          {
+            "name": "conv.0.0",
+            "kind": "conv",
+            "macs": 4816896,
+            "input_shape": [
+              1,
+              64,
+              14,
+              14
+            ],
+            "output_shape": [
+              1,
+              384,
+              14,
+              14
+            ],
+            "output_mib": 0.287109375,
+            "in_channels": 64,
+            "out_channels": 384
+          },
+          {
+            "name": "conv.1.0",
+            "kind": "depthwise",
+            "macs": 677376,
+            "input_shape": [
+              1,
+              384,
+              14,
+              14
+            ],
+            "output_shape": [
+              1,
+              384,
+              14,
+              14
+            ],
+            "output_mib": 0.287109375,
+            "in_channels": 384,
+            "out_channels": 384
+          },
+          {
+            "name": "conv.2",
+            "kind": "conv",
+            "macs": 4816896,
+            "input_shape": [
+              1,
+              384,
+              14,
+              14
+            ],
+            "output_shape": [
+              1,
+              64,
+              14,
+              14
+            ],
+            "output_mib": 0.0478515625,
+            "in_channels": 384,
+            "out_channels": 64
+          }
+        ]
+      },
+      {
+        "block": "features.9",
+        "operators": [
+          {
+            "name": "conv.0.0",
+            "kind": "conv",
+            "macs": 4816896,
+            "input_shape": [
+              1,
+              64,
+              14,
+              14
+            ],
+            "output_shape": [
+              1,
+              384,
+              14,
+              14
+            ],
+            "output_mib": 0.287109375,
+            "in_channels": 64,
+            "out_channels": 384
+          },
+          {
+            "name": "conv.1.0",
+            "kind": "depthwise",
+            "macs": 677376,
+            "input_shape": [
+              1,
+              384,
+              14,
+              14
+            ],
+            "output_shape": [
+              1,
+              384,
+              14,
+              14
+            ],
+            "output_mib": 0.287109375,
+            "in_channels": 384,
+            "out_channels": 384
+          },
+          {
+            "name": "conv.2",
+            "kind": "conv",
+            "macs": 4816896,
+            "input_shape": [
+              1,
+              384,
+              14,
+              14
+            ],
+            "output_shape": [
+              1,
+              64,
+              14,
+              14
+            ],
+            "output_mib": 0.0478515625,
+            "in_channels": 384,
+            "out_channels": 64
+          }
+        ]
+      },
+      {
+        "block": "features.10",
+        "operators": [
+          {
+            "name": "conv.0.0",
+            "kind": "conv",
+            "macs": 4816896,
+            "input_shape": [
+              1,
+              64,
+              14,
+              14
+            ],
+            "output_shape": [
+              1,
+              384,
+              14,
+              14
+            ],
+            "output_mib": 0.287109375,
+            "in_channels": 64,
+            "out_channels": 384
+          },
+          {
+            "name": "conv.1.0",
+            "kind": "depthwise",
+            "macs": 677376,
+            "input_shape": [
+              1,
+              384,
+              14,
+              14
+            ],
+            "output_shape": [
+              1,
+              384,
+              14,
+              14
+            ],
+            "output_mib": 0.287109375,
+            "in_channels": 384,
+            "out_channels": 384
+          },
+          {
+            "name": "conv.2",
+            "kind": "conv",
+            "macs": 4816896,
+            "input_shape": [
+              1,
+              384,
+              14,
+              14
+            ],
+            "output_shape": [
+              1,
+              64,
+              14,
+              14
+            ],
+            "output_mib": 0.0478515625,
+            "in_channels": 384,
+            "out_channels": 64
+          }
+        ]
+      },
+      {
+        "block": "features.11",
+        "operators": [
+          {
+            "name": "conv.0.0",
+            "kind": "conv",
+            "macs": 4816896,
+            "input_shape": [
+              1,
+              64,
+              14,
+              14
+            ],
+            "output_shape": [
+              1,
+              384,
+              14,
+              14
+            ],
+            "output_mib": 0.287109375,
+            "in_channels": 64,
+            "out_channels": 384
+          },
+          {
+            "name": "conv.1.0",
+            "kind": "depthwise",
+            "macs": 677376,
+            "input_shape": [
+              1,
+              384,
+              14,
+              14
+            ],
+            "output_shape": [
+              1,
+              384,
+              14,
+              14
+            ],
+            "output_mib": 0.287109375,
+            "in_channels": 384,
+            "out_channels": 384
+          },
+          {
+            "name": "conv.2",
+            "kind": "conv",
+            "macs": 7225344,
+            "input_shape": [
+              1,
+              384,
+              14,
+              14
+            ],
+            "output_shape": [
+              1,
+              96,
+              14,
+              14
+            ],
+            "output_mib": 0.07177734375,
+            "in_channels": 384,
+            "out_channels": 96
+          }
+        ]
+      },
+      {
+        "block": "features.12",
+        "operators": [
+          {
+            "name": "conv.0.0",
+            "kind": "conv",
+            "macs": 10838016,
+            "input_shape": [
+              1,
+              96,
+              14,
+              14
+            ],
+            "output_shape": [
+              1,
+              576,
+              14,
+              14
+            ],
+            "output_mib": 0.4306640625,
+            "in_channels": 96,
+            "out_channels": 576
+          },
+          {
+            "name": "conv.1.0",
+            "kind": "depthwise",
+            "macs": 1016064,
+            "input_shape": [
+              1,
+              576,
+              14,
+              14
+            ],
+            "output_shape": [
+              1,
+              576,
+              14,
+              14
+            ],
+            "output_mib": 0.4306640625,
+            "in_channels": 576,
+            "out_channels": 576
+          },
+          {
+            "name": "conv.2",
+            "kind": "conv",
+            "macs": 10838016,
+            "input_shape": [
+              1,
+              576,
+              14,
+              14
+            ],
+            "output_shape": [
+              1,
+              96,
+              14,
+              14
+            ],
+            "output_mib": 0.07177734375,
+            "in_channels": 576,
+            "out_channels": 96
+          }
+        ]
+      },
+      {
+        "block": "features.13",
+        "operators": [
+          {
+            "name": "conv.0.0",
+            "kind": "conv",
+            "macs": 10838016,
+            "input_shape": [
+              1,
+              96,
+              14,
+              14
+            ],
+            "output_shape": [
+              1,
+              576,
+              14,
+              14
+            ],
+            "output_mib": 0.4306640625,
+            "in_channels": 96,
+            "out_channels": 576
+          },
+          {
+            "name": "conv.1.0",
+            "kind": "depthwise",
+            "macs": 1016064,
+            "input_shape": [
+              1,
+              576,
+              14,
+              14
+            ],
+            "output_shape": [
+              1,
+              576,
+              14,
+              14
+            ],
+            "output_mib": 0.4306640625,
+            "in_channels": 576,
+            "out_channels": 576
+          },
+          {
+            "name": "conv.2",
+            "kind": "conv",
+            "macs": 10838016,
+            "input_shape": [
+              1,
+              576,
+              14,
+              14
+            ],
+            "output_shape": [
+              1,
+              96,
+              14,
+              14
+            ],
+            "output_mib": 0.07177734375,
+            "in_channels": 576,
+            "out_channels": 96
+          }
+        ]
+      },
+      {
+        "block": "features.14",
+        "operators": [
+          {
+            "name": "conv.0.0",
+            "kind": "conv",
+            "macs": 10838016,
+            "input_shape": [
+              1,
+              96,
+              14,
+              14
+            ],
+            "output_shape": [
+              1,
+              576,
+              14,
+              14
+            ],
+            "output_mib": 0.4306640625,
+            "in_channels": 96,
+            "out_channels": 576
+          },
+          {
+            "name": "conv.1.0",
+            "kind": "depthwise",
+            "macs": 254016,
+            "input_shape": [
+              1,
+              576,
+              14,
+              14
+            ],
+            "output_shape": [
+              1,
+              576,
+              7,
+              7
+            ],
+            "output_mib": 0.107666015625,
+            "in_channels": 576,
+            "out_channels": 576
+          },
+          {
+            "name": "conv.2",
+            "kind": "conv",
+            "macs": 4515840,
+            "input_shape": [
+              1,
+              576,
+              7,
+              7
+            ],
+            "output_shape": [
+              1,
+              160,
+              7,
+              7
+            ],
+            "output_mib": 0.0299072265625,
+            "in_channels": 576,
+            "out_channels": 160
+          }
+        ]
+      },
+      {
+        "block": "features.15",
+        "operators": [
+          {
+            "name": "conv.0.0",
+            "kind": "conv",
+            "macs": 7526400,
+            "input_shape": [
+              1,
+              160,
+              7,
+              7
+            ],
+            "output_shape": [
+              1,
+              960,
+              7,
+              7
+            ],
+            "output_mib": 0.179443359375,
+            "in_channels": 160,
+            "out_channels": 960
+          },
+          {
+            "name": "conv.1.0",
+            "kind": "depthwise",
+            "macs": 423360,
+            "input_shape": [
+              1,
+              960,
+              7,
+              7
+            ],
+            "output_shape": [
+              1,
+              960,
+              7,
+              7
+            ],
+            "output_mib": 0.179443359375,
+            "in_channels": 960,
+            "out_channels": 960
+          },
+          {
+            "name": "conv.2",
+            "kind": "conv",
+            "macs": 7526400,
+            "input_shape": [
+              1,
+              960,
+              7,
+              7
+            ],
+            "output_shape": [
+              1,
+              160,
+              7,
+              7
+            ],
+            "output_mib": 0.0299072265625,
+            "in_channels": 960,
+            "out_channels": 160
+          }
+        ]
+      },
+      {
+        "block": "features.16",
+        "operators": [
+          {
+            "name": "conv.0.0",
+            "kind": "conv",
+            "macs": 7526400,
+            "input_shape": [
+              1,
+              160,
+              7,
+              7
+            ],
+            "output_shape": [
+              1,
+              960,
+              7,
+              7
+            ],
+            "output_mib": 0.179443359375,
+            "in_channels": 160,
+            "out_channels": 960
+          },
+          {
+            "name": "conv.1.0",
+            "kind": "depthwise",
+            "macs": 423360,
+            "input_shape": [
+              1,
+              960,
+              7,
+              7
+            ],
+            "output_shape": [
+              1,
+              960,
+              7,
+              7
+            ],
+            "output_mib": 0.179443359375,
+            "in_channels": 960,
+            "out_channels": 960
+          },
+          {
+            "name": "conv.2",
+            "kind": "conv",
+            "macs": 7526400,
+            "input_shape": [
+              1,
+              960,
+              7,
+              7
+            ],
+            "output_shape": [
+              1,
+              160,
+              7,
+              7
+            ],
+            "output_mib": 0.0299072265625,
+            "in_channels": 960,
+            "out_channels": 160
+          }
+        ]
+      },
+      {
+        "block": "features.17",
+        "operators": [
+          {
+            "name": "conv.0.0",
+            "kind": "conv",
+            "macs": 7526400,
+            "input_shape": [
+              1,
+              160,
+              7,
+              7
+            ],
+            "output_shape": [
+              1,
+              960,
+              7,
+              7
+            ],
+            "output_mib": 0.179443359375,
+            "in_channels": 160,
+            "out_channels": 960
+          },
+          {
+            "name": "conv.1.0",
+            "kind": "depthwise",
+            "macs": 423360,
+            "input_shape": [
+              1,
+              960,
+              7,
+              7
+            ],
+            "output_shape": [
+              1,
+              960,
+              7,
+              7
+            ],
+            "output_mib": 0.179443359375,
+            "in_channels": 960,
+            "out_channels": 960
+          },
+          {
+            "name": "conv.2",
+            "kind": "conv",
+            "macs": 15052800,
+            "input_shape": [
+              1,
+              960,
+              7,
+              7
+            ],
+            "output_shape": [
+              1,
+              320,
+              7,
+              7
+            ],
+            "output_mib": 0.059814453125,
+            "in_channels": 960,
+            "out_channels": 320
+          }
+        ]
+      },
+      {
+        "block": "features.18",
+        "operators": [
+          {
+            "name": "0",
+            "kind": "conv",
+            "macs": 20070400,
+            "input_shape": [
+              1,
+              320,
+              7,
+              7
+            ],
+            "output_shape": [
+              1,
+              1280,
+              7,
+              7
+            ],
+            "output_mib": 0.2392578125,
+            "in_channels": 320,
+            "out_channels": 1280
+          }
+        ]
+      },
+      {
+        "block": "head",
+        "operators": [
+          {
+            "name": "2.1",
+            "kind": "linear",
+            "macs": 1280000,
+            "input_shape": [
+              1,
+              1280
+            ],
+            "output_shape": [
+              1,
+              1000
+            ],
+            "output_mib": 0.003814697265625,
+            "in_channels": 1280,
+            "out_channels": 1000
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "model": "squeezenet1_1",
+    "parameters": 1235496,
+    "fp32_weights_mib": 4.713043212890625,
+    "conv_linear_macs": 349151936,
+    "blocks": 10,
+    "output_shape": [
+      1,
+      1000
+    ],
+    "output_finite": true,
+    "block_forward_matches_full_model": true,
+    "max_abs_difference": 0.0,
+    "calibration": {
+      "source": "https://docs.pytorch.org/vision/0.21/_modules/torchvision/models/squeezenet.html",
+      "torch": "2.6.0+cpu",
+      "torchvision": "0.21.0+cpu",
+      "input_shape": [
+        1,
+        3,
+        224,
+        224
+      ],
+      "dtype": "float32",
+      "weights": "none",
+      "macs_scope": "Conv2d and Linear only; grouped Conv divides by groups",
+      "accuracy_measured": false,
+      "forward_checked": true
+    },
+    "operator_records": [
+      {
+        "block": "stem",
+        "operators": [
+          {
+            "name": "0",
+            "kind": "conv",
+            "macs": 21290688,
+            "input_shape": [
+              1,
+              3,
+              224,
+              224
+            ],
+            "output_shape": [
+              1,
+              64,
+              111,
+              111
+            ],
+            "output_mib": 3.008056640625,
+            "in_channels": 3,
+            "out_channels": 64
+          }
+        ]
+      },
+      {
+        "block": "fire.3",
+        "operators": [
+          {
+            "name": "0.squeeze",
+            "kind": "conv",
+            "macs": 3097600,
+            "input_shape": [
+              1,
+              64,
+              55,
+              55
+            ],
+            "output_shape": [
+              1,
+              16,
+              55,
+              55
+            ],
+            "output_mib": 0.18463134765625,
+            "in_channels": 64,
+            "out_channels": 16
+          },
+          {
+            "name": "0.expand1x1",
+            "kind": "conv",
+            "macs": 3097600,
+            "input_shape": [
+              1,
+              16,
+              55,
+              55
+            ],
+            "output_shape": [
+              1,
+              64,
+              55,
+              55
+            ],
+            "output_mib": 0.738525390625,
+            "in_channels": 16,
+            "out_channels": 64
+          },
+          {
+            "name": "0.expand3x3",
+            "kind": "conv",
+            "macs": 27878400,
+            "input_shape": [
+              1,
+              16,
+              55,
+              55
+            ],
+            "output_shape": [
+              1,
+              64,
+              55,
+              55
+            ],
+            "output_mib": 0.738525390625,
+            "in_channels": 16,
+            "out_channels": 64
+          }
+        ]
+      },
+      {
+        "block": "fire.4",
+        "operators": [
+          {
+            "name": "0.squeeze",
+            "kind": "conv",
+            "macs": 6195200,
+            "input_shape": [
+              1,
+              128,
+              55,
+              55
+            ],
+            "output_shape": [
+              1,
+              16,
+              55,
+              55
+            ],
+            "output_mib": 0.18463134765625,
+            "in_channels": 128,
+            "out_channels": 16
+          },
+          {
+            "name": "0.expand1x1",
+            "kind": "conv",
+            "macs": 3097600,
+            "input_shape": [
+              1,
+              16,
+              55,
+              55
+            ],
+            "output_shape": [
+              1,
+              64,
+              55,
+              55
+            ],
+            "output_mib": 0.738525390625,
+            "in_channels": 16,
+            "out_channels": 64
+          },
+          {
+            "name": "0.expand3x3",
+            "kind": "conv",
+            "macs": 27878400,
+            "input_shape": [
+              1,
+              16,
+              55,
+              55
+            ],
+            "output_shape": [
+              1,
+              64,
+              55,
+              55
+            ],
+            "output_mib": 0.738525390625,
+            "in_channels": 16,
+            "out_channels": 64
+          }
+        ]
+      },
+      {
+        "block": "fire.6",
+        "operators": [
+          {
+            "name": "0.squeeze",
+            "kind": "conv",
+            "macs": 2985984,
+            "input_shape": [
+              1,
+              128,
+              27,
+              27
+            ],
+            "output_shape": [
+              1,
+              32,
+              27,
+              27
+            ],
+            "output_mib": 0.0889892578125,
+            "in_channels": 128,
+            "out_channels": 32
+          },
+          {
+            "name": "0.expand1x1",
+            "kind": "conv",
+            "macs": 2985984,
+            "input_shape": [
+              1,
+              32,
+              27,
+              27
+            ],
+            "output_shape": [
+              1,
+              128,
+              27,
+              27
+            ],
+            "output_mib": 0.35595703125,
+            "in_channels": 32,
+            "out_channels": 128
+          },
+          {
+            "name": "0.expand3x3",
+            "kind": "conv",
+            "macs": 26873856,
+            "input_shape": [
+              1,
+              32,
+              27,
+              27
+            ],
+            "output_shape": [
+              1,
+              128,
+              27,
+              27
+            ],
+            "output_mib": 0.35595703125,
+            "in_channels": 32,
+            "out_channels": 128
+          }
+        ]
+      },
+      {
+        "block": "fire.7",
+        "operators": [
+          {
+            "name": "0.squeeze",
+            "kind": "conv",
+            "macs": 5971968,
+            "input_shape": [
+              1,
+              256,
+              27,
+              27
+            ],
+            "output_shape": [
+              1,
+              32,
+              27,
+              27
+            ],
+            "output_mib": 0.0889892578125,
+            "in_channels": 256,
+            "out_channels": 32
+          },
+          {
+            "name": "0.expand1x1",
+            "kind": "conv",
+            "macs": 2985984,
+            "input_shape": [
+              1,
+              32,
+              27,
+              27
+            ],
+            "output_shape": [
+              1,
+              128,
+              27,
+              27
+            ],
+            "output_mib": 0.35595703125,
+            "in_channels": 32,
+            "out_channels": 128
+          },
+          {
+            "name": "0.expand3x3",
+            "kind": "conv",
+            "macs": 26873856,
+            "input_shape": [
+              1,
+              32,
+              27,
+              27
+            ],
+            "output_shape": [
+              1,
+              128,
+              27,
+              27
+            ],
+            "output_mib": 0.35595703125,
+            "in_channels": 32,
+            "out_channels": 128
+          }
+        ]
+      },
+      {
+        "block": "fire.9",
+        "operators": [
+          {
+            "name": "0.squeeze",
+            "kind": "conv",
+            "macs": 2076672,
+            "input_shape": [
+              1,
+              256,
+              13,
+              13
+            ],
+            "output_shape": [
+              1,
+              48,
+              13,
+              13
+            ],
+            "output_mib": 0.03094482421875,
+            "in_channels": 256,
+            "out_channels": 48
+          },
+          {
+            "name": "0.expand1x1",
+            "kind": "conv",
+            "macs": 1557504,
+            "input_shape": [
+              1,
+              48,
+              13,
+              13
+            ],
+            "output_shape": [
+              1,
+              192,
+              13,
+              13
+            ],
+            "output_mib": 0.123779296875,
+            "in_channels": 48,
+            "out_channels": 192
+          },
+          {
+            "name": "0.expand3x3",
+            "kind": "conv",
+            "macs": 14017536,
+            "input_shape": [
+              1,
+              48,
+              13,
+              13
+            ],
+            "output_shape": [
+              1,
+              192,
+              13,
+              13
+            ],
+            "output_mib": 0.123779296875,
+            "in_channels": 48,
+            "out_channels": 192
+          }
+        ]
+      },
+      {
+        "block": "fire.10",
+        "operators": [
+          {
+            "name": "0.squeeze",
+            "kind": "conv",
+            "macs": 3115008,
+            "input_shape": [
+              1,
+              384,
+              13,
+              13
+            ],
+            "output_shape": [
+              1,
+              48,
+              13,
+              13
+            ],
+            "output_mib": 0.03094482421875,
+            "in_channels": 384,
+            "out_channels": 48
+          },
+          {
+            "name": "0.expand1x1",
+            "kind": "conv",
+            "macs": 1557504,
+            "input_shape": [
+              1,
+              48,
+              13,
+              13
+            ],
+            "output_shape": [
+              1,
+              192,
+              13,
+              13
+            ],
+            "output_mib": 0.123779296875,
+            "in_channels": 48,
+            "out_channels": 192
+          },
+          {
+            "name": "0.expand3x3",
+            "kind": "conv",
+            "macs": 14017536,
+            "input_shape": [
+              1,
+              48,
+              13,
+              13
+            ],
+            "output_shape": [
+              1,
+              192,
+              13,
+              13
+            ],
+            "output_mib": 0.123779296875,
+            "in_channels": 48,
+            "out_channels": 192
+          }
+        ]
+      },
+      {
+        "block": "fire.11",
+        "operators": [
+          {
+            "name": "0.squeeze",
+            "kind": "conv",
+            "macs": 4153344,
+            "input_shape": [
+              1,
+              384,
+              13,
+              13
+            ],
+            "output_shape": [
+              1,
+              64,
+              13,
+              13
+            ],
+            "output_mib": 0.041259765625,
+            "in_channels": 384,
+            "out_channels": 64
+          },
+          {
+            "name": "0.expand1x1",
+            "kind": "conv",
+            "macs": 2768896,
+            "input_shape": [
+              1,
+              64,
+              13,
+              13
+            ],
+            "output_shape": [
+              1,
+              256,
+              13,
+              13
+            ],
+            "output_mib": 0.1650390625,
+            "in_channels": 64,
+            "out_channels": 256
+          },
+          {
+            "name": "0.expand3x3",
+            "kind": "conv",
+            "macs": 24920064,
+            "input_shape": [
+              1,
+              64,
+              13,
+              13
+            ],
+            "output_shape": [
+              1,
+              256,
+              13,
+              13
+            ],
+            "output_mib": 0.1650390625,
+            "in_channels": 64,
+            "out_channels": 256
+          }
+        ]
+      },
+      {
+        "block": "fire.12",
+        "operators": [
+          {
+            "name": "0.squeeze",
+            "kind": "conv",
+            "macs": 5537792,
+            "input_shape": [
+              1,
+              512,
+              13,
+              13
+            ],
+            "output_shape": [
+              1,
+              64,
+              13,
+              13
+            ],
+            "output_mib": 0.041259765625,
+            "in_channels": 512,
+            "out_channels": 64
+          },
+          {
+            "name": "0.expand1x1",
+            "kind": "conv",
+            "macs": 2768896,
+            "input_shape": [
+              1,
+              64,
+              13,
+              13
+            ],
+            "output_shape": [
+              1,
+              256,
+              13,
+              13
+            ],
+            "output_mib": 0.1650390625,
+            "in_channels": 64,
+            "out_channels": 256
+          },
+          {
+            "name": "0.expand3x3",
+            "kind": "conv",
+            "macs": 24920064,
+            "input_shape": [
+              1,
+              64,
+              13,
+              13
+            ],
+            "output_shape": [
+              1,
+              256,
+              13,
+              13
+            ],
+            "output_mib": 0.1650390625,
+            "in_channels": 64,
+            "out_channels": 256
+          }
+        ]
+      },
+      {
+        "block": "head",
+        "operators": [
+          {
+            "name": "0.1",
+            "kind": "conv",
+            "macs": 86528000,
+            "input_shape": [
+              1,
+              512,
+              13,
+              13
+            ],
+            "output_shape": [
+              1,
+              1000,
+              13,
+              13
+            ],
+            "output_mib": 0.644683837890625,
+            "in_channels": 512,
+            "out_channels": 1000
+          }
+        ]
+      }
+    ]
+  }
+]

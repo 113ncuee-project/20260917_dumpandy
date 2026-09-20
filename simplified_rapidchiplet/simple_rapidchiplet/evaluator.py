@@ -27,16 +27,11 @@ class PpaReference:
     max_power_w: float
 
 
-FPS_MISS_PENALTY_WEIGHT = 0.75
-FPS_EXCESS_BONUS_WEIGHT = 0.15
-FPS_EXCESS_BONUS_CAP = 0.25
-
-
 PPA_WEIGHT_PRESETS: dict[str, PpaWeights] = {
     "balanced": PpaWeights(latency=1.0, area=1.0, power=1.0),
-    "latency": PpaWeights(latency=0.8, area=0.1, power=0.1),
-    "area": PpaWeights(latency=0.1, area=0.8, power=0.1),
-    "power": PpaWeights(latency=0.1, area=0.1, power=0.8),
+    "latency": PpaWeights(latency=0.6, area=0.2, power=0.2),
+    "area": PpaWeights(latency=0.2, area=0.6, power=0.2),
+    "power": PpaWeights(latency=0.2, area=0.2, power=0.6),
 }
 
 
@@ -45,14 +40,9 @@ class EvaluationResult:
     model: str
     dataset: str
     topology: str
-    target_fps: float
-    target_met: bool
-    miss_reason: str
     available_chiplets: int
-    compute_only_chiplets: int
     selected_chiplets: int
     unused_chiplets: int
-    required_tops: float
     peak_tops_per_chiplet: float
     achieved_fps: float
     compute_limited_fps: float
@@ -76,11 +66,6 @@ class EvaluationResult:
     ppa_latency_weight: float
     ppa_area_weight: float
     ppa_power_weight: float
-    ppa_fps_penalty_weight: float
-    ppa_fps_bonus_weight: float
-    ppa_fps_bonus_cap: float
-    fps_penalty: float
-    fps_bonus: float
     total_traffic_mb_per_inference: float
     edge_count: int
     link_count: int
@@ -113,6 +98,10 @@ class EvaluationResult:
     e2e_path_latency_source: str = ""
     pipeline_initiation_interval_s: float = 0.0
     pipeline_fps: float = 0.0
+    backend: str = ""
+    effective_hardware: dict[str, object] = field(default_factory=dict)
+    communication_events: tuple[dict[str, object], ...] = ()
+    link_dynamic_energy_per_inference_j: float = 0.0
 
     def to_dict(self) -> dict[str, object]:
         return asdict(self)
@@ -136,18 +125,11 @@ def resolve_ppa_weights(goal: str, weights: tuple[float, float, float] | None = 
     return PpaWeights(latency=latency / total, area=area / total, power=power / total)
 
 
-def compute_only_chiplets(model: ModelSpec, cfg: EvalConfig, target_fps: float) -> int:
-    required_ops = model.ops_per_inference(cfg.chiplet.op_per_mac) * target_fps
-    usable_ops_per_chiplet = cfg.chiplet.peak_ops_per_second * cfg.chiplet.utilization
-    return max(1, math.ceil(required_ops / usable_ops_per_chiplet))
-
-
 def evaluate_one(
     model: ModelSpec,
     topology_kind: str,
     chiplet_count: int,
     cfg: EvalConfig,
-    target_fps: float,
     workload: WorkloadPartition | None = None,
     ppa_goal: str = "balanced",
     ppa_weights: PpaWeights | None = None,
@@ -181,7 +163,6 @@ def evaluate_one(
         topology=topology,
         workload=workload,
         cfg=cfg,
-        target_fps=target_fps,
         ppa_goal=ppa_goal,
         ppa_weights=resolve_ppa_weights(ppa_goal) if ppa_weights is None else ppa_weights,
     )
@@ -193,7 +174,6 @@ def _evaluate_workload(
     topology: Topology,
     workload: WorkloadPartition,
     cfg: EvalConfig,
-    target_fps: float,
     ppa_goal: str,
     ppa_weights: PpaWeights,
 ) -> EvaluationResult:
@@ -231,7 +211,6 @@ def _evaluate_workload(
     achieved_fps = min(compute_fps, network_fps, pipeline_fps)
     power_w = rapid_metrics.total_power_w
     perf_per_w = achieved_fps / power_w if power_w > 0 else math.inf
-    required_tops = ops_per_inference * target_fps / 1e12
 
     bottleneck = (
         "-"
@@ -246,20 +225,9 @@ def _evaluate_workload(
         model=model.name,
         dataset=model.dataset,
         topology=topology_kind,
-        target_fps=target_fps,
-        target_met=achieved_fps >= target_fps,
-        miss_reason=_miss_reason(
-            achieved_fps,
-            compute_fps,
-            network_fps,
-            pipeline_fps,
-            target_fps,
-        ),
         available_chiplets=cfg.max_chiplets,
-        compute_only_chiplets=compute_only_chiplets(model, cfg, target_fps),
         selected_chiplets=topology.node_count,
         unused_chiplets=max(0, cfg.max_chiplets - topology.node_count),
-        required_tops=required_tops,
         peak_tops_per_chiplet=cfg.chiplet.peak_tops,
         achieved_fps=achieved_fps,
         compute_limited_fps=compute_fps,
@@ -283,11 +251,6 @@ def _evaluate_workload(
         ppa_latency_weight=ppa_weights.latency,
         ppa_area_weight=ppa_weights.area,
         ppa_power_weight=ppa_weights.power,
-        ppa_fps_penalty_weight=FPS_MISS_PENALTY_WEIGHT,
-        ppa_fps_bonus_weight=FPS_EXCESS_BONUS_WEIGHT,
-        ppa_fps_bonus_cap=FPS_EXCESS_BONUS_CAP,
-        fps_penalty=math.inf,
-        fps_bonus=0.0,
         total_traffic_mb_per_inference=workload.total_traffic_bits_per_inference / 8 / 1024 / 1024,
         edge_count=len(topology.edges),
         link_count=rapid_metrics.link_count,
@@ -327,6 +290,10 @@ def _evaluate_workload(
         e2e_path_latency_source=e2e.path_latency_source,
         pipeline_initiation_interval_s=e2e.pipeline_initiation_interval_s,
         pipeline_fps=pipeline_fps,
+        backend=rapid_metrics.backend,
+        effective_hardware=rapid_metrics.effective_hardware,
+        communication_events=workload.communication_events,
+        link_dynamic_energy_per_inference_j=_link_energy(topology, workload, cfg),
     )
 
 
@@ -334,7 +301,6 @@ def evaluate_models(
     models: list[ModelSpec],
     topology_kinds: list[str],
     cfg: EvalConfig,
-    target_fps: float | None = None,
     ppa_goal: str = "balanced",
     ppa_weights: tuple[float, float, float] | None = None,
     dp_top_k: int = 12,
@@ -342,7 +308,6 @@ def evaluate_models(
     ppa_reference: PpaReference | None = None,
     dp_cost_mode: DpCostMode = "both",
 ) -> tuple[list[EvaluationResult], list[EvaluationResult]]:
-    target = cfg.target_fps if target_fps is None else target_fps
     weights = resolve_ppa_weights(ppa_goal, ppa_weights)
     summaries: list[EvaluationResult] = []
     sweeps: list[EvaluationResult] = []
@@ -371,8 +336,7 @@ def evaluate_models(
                             topology=topology,
                             workload=workload,
                             cfg=cfg,
-                            target_fps=target,
-                            ppa_goal=ppa_goal,
+                                            ppa_goal=ppa_goal,
                             ppa_weights=weights,
                         )
                     )
@@ -427,24 +391,15 @@ def _score_results(
         latency_score = _normalized_metric(row.avg_latency_ns, ref.max_latency_ns)
         area_score = _normalized_metric(row.total_area_mm2, ref.max_area_mm2)
         power_score = _normalized_metric(row.total_power_w, ref.max_power_w)
-        fps_penalty = _fps_penalty(row.achieved_fps, row.target_fps)
-        fps_bonus = _fps_bonus(row.achieved_fps, row.target_fps)
         ppa_score = (
             weights.latency * latency_score
             + weights.area * area_score
             + weights.power * power_score
-            + FPS_MISS_PENALTY_WEIGHT * fps_penalty
-            - FPS_EXCESS_BONUS_WEIGHT * fps_bonus
         )
         scored.append(
             replace(
                 row,
                 ppa_score=ppa_score,
-                fps_penalty=fps_penalty,
-                fps_bonus=fps_bonus,
-                ppa_fps_penalty_weight=FPS_MISS_PENALTY_WEIGHT,
-                ppa_fps_bonus_weight=FPS_EXCESS_BONUS_WEIGHT,
-                ppa_fps_bonus_cap=FPS_EXCESS_BONUS_CAP,
             )
         )
     return scored
@@ -456,8 +411,8 @@ def _select_summary(results: list[EvaluationResult]) -> EvaluationResult | None:
     return min(
         results,
         key=lambda row: (
+            not row.architecture_feasible,
             row.ppa_score,
-            not row.target_met,
             row.selected_chiplets,
             row.total_power_w,
             row.avg_latency_ns,
@@ -484,48 +439,15 @@ def _finite_max(values) -> float:
 
 
 def _normalized_metric(value: float, maximum: float) -> float:
-    if not math.isfinite(value) or maximum <= 0:
-        return 0.0
+    if not math.isfinite(value) or value < 0 or maximum <= 0:
+        return math.inf
     return value / maximum
 
 
-def _fps_penalty(achieved_fps: float, target_fps: float) -> float:
-    if target_fps <= 0 or achieved_fps >= target_fps:
-        return 0.0
-    return max(0.0, (target_fps - achieved_fps) / target_fps)
 
 
-def _fps_bonus(achieved_fps: float, target_fps: float) -> float:
-    if target_fps <= 0 or achieved_fps <= target_fps:
-        return 0.0
-    return min(FPS_EXCESS_BONUS_CAP, (achieved_fps - target_fps) / target_fps)
-
-
-def _compute_limited_fps(ops_per_chiplet: tuple[float, ...], cfg: EvalConfig) -> float:
-    usable_ops_per_chiplet = cfg.chiplet.peak_ops_per_second * cfg.chiplet.utilization
-    rates = [usable_ops_per_chiplet / ops for ops in ops_per_chiplet if ops > 0]
-    return min(rates, default=math.inf)
-
-
-def _miss_reason(
-    achieved_fps: float,
-    compute_fps: float,
-    network_fps: float,
-    pipeline_fps: float,
-    target_fps: float,
-) -> str:
-    if achieved_fps >= target_fps:
-        return "-"
-    limits = {
-        "compute": compute_fps,
-        "network": network_fps,
-        "pipeline": pipeline_fps,
-    }
-    bottleneck = min(limits, key=limits.get)
-    if bottleneck == "compute":
-        return f"compute bottleneck: compute_fps={compute_fps:.2f} < target_fps={target_fps:.2f}"
-    if bottleneck == "network" and math.isfinite(network_fps):
-        return f"network bottleneck: network_fps={network_fps:.2f} < target_fps={target_fps:.2f}"
-    if bottleneck == "pipeline" and math.isfinite(pipeline_fps):
-        return f"pipeline bottleneck: pipeline_fps={pipeline_fps:.2f} < target_fps={target_fps:.2f}"
-    return f"achieved_fps={achieved_fps:.2f} < target_fps={target_fps:.2f}"
+def _link_energy(topology, workload, cfg):
+    from .routing import shortest_paths_for_pairs
+    routes = shortest_paths_for_pairs(topology, workload.traffic_bits_per_inference)
+    bit_hops = sum(bits * (len(routes[pair])-1) for pair, bits in workload.traffic_bits_per_inference.items())
+    return bit_hops * cfg.power.link_dynamic_pj_per_bit * 1e-12

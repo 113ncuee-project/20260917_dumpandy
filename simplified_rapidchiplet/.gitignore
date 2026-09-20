@@ -16,4 +16,7 @@ Crashpad/
 .venv/
 venv/
 env/
+.model_runtime/
+.runtime/
+dist/
 

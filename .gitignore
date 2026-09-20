@@ -25,3 +25,9 @@ Thumbs.db
 .vscode/
 .idea/
 
+# Local bootstrap downloads, package builds and clean-install tests
+packaging_cache/
+dist/
+packaging_test*/
+**/.runtime/
+

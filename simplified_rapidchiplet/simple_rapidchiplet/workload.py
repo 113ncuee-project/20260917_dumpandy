@@ -18,6 +18,7 @@ class WorkloadPartition:
     group_specs: tuple[tuple[int, int, int], ...] = ()
     mapping_strategies: tuple[str, ...] = ()
     mapping_plan: dict[str, object] = field(default_factory=dict)
+    communication_events: tuple[dict[str, object], ...] = ()
 
     @property
     def block_labels(self) -> tuple[str, ...]:
@@ -146,62 +147,25 @@ def _build_partition(
     search_method: str,
     mapping_strategies: tuple[str, ...] | None = None,
 ) -> WorkloadPartition:
-    cumulative_ops = _cumulative_stage_ops(model, op_per_mac)
-    traffic: dict[tuple[int, int], float] = {}
-    ops_per_chiplet: list[float] = []
-    labels: list[str] = []
-    chiplet = 0
-
-    for group_index, ((start, end), group_chiplets) in enumerate(zip(groups, allocation)):
-        group_start_ops = 0.0 if start == 0 else cumulative_ops[start - 1]
-        group_end_ops = cumulative_ops[end - 1]
-        group_ops = group_end_ops - group_start_ops
-        ops_per_part = group_ops / group_chiplets
-        base_label = _stage_range_label(model, start, end)
-
-        for part in range(group_chiplets):
-            ops_per_chiplet.append(ops_per_part)
-            labels.append(base_label if group_chiplets == 1 else f"{base_label}[{part + 1}/{group_chiplets}]")
-            is_last_part_in_group = part == group_chiplets - 1
-            is_last_group = group_index == len(groups) - 1
-            if is_last_part_in_group and is_last_group:
-                continue
-
-            if is_last_part_in_group:
-                output_mb = model.stages[end - 1].output_mb
-            else:
-                boundary_ops = group_start_ops + ops_per_part * (part + 1)
-                stage_index = _stage_at_boundary(boundary_ops, cumulative_ops)
-                output_mb = model.stages[stage_index].output_mb
-            traffic[(chiplet, chiplet + 1)] = output_mb * 1024 * 1024 * 8
-            chiplet += 1
-
-    group_specs = tuple(
-        (start, end, group_chiplets)
-        for (start, end), group_chiplets in zip(groups, allocation)
-    )
-    strategies = (
-        default_mapping_strategies(group_specs)
-        if mapping_strategies is None
-        else tuple(mapping_strategies)
-    )
-    mapping_plan = build_mapping_plan(model, group_specs, strategies)
-    for edge in mapping_plan.traffic_edges:
-        source = int(edge["source"])
-        target = int(edge["target"])
-        bits = float(edge["mb"]) * 1024 * 1024 * 8
-        traffic[(source, target)] = traffic.get((source, target), 0.0) + bits
-
+    from .communication import build_communication_events, aggregate_flows
+    group_specs = tuple((start, end, parts) for (start, end), parts in zip(groups, allocation))
+    strategies = default_mapping_strategies(group_specs) if mapping_strategies is None else tuple(mapping_strategies)
+    plan = build_mapping_plan(model, group_specs, strategies)
+    strategies = tuple(g.strategy for g in plan.groups)
+    events = build_communication_events(model, group_specs, strategies)
+    traffic = aggregate_flows(events)
+    ops, labels = [], []
+    for start, end, parts in group_specs:
+        group_ops = sum(b.macs_g for b in model.blocks[start:end]) * 1e9 * op_per_mac
+        label = _stage_range_label(model, start, end)
+        for part in range(parts):
+            ops.append(group_ops / parts)
+            labels.append(label if parts == 1 else f"{label}[{part + 1}/{parts}]")
     return WorkloadPartition(
-        traffic_bits_per_inference=traffic,
-        total_traffic_bits_per_inference=sum(traffic.values()),
-        ops_per_chiplet=tuple(ops_per_chiplet),
-        stage_labels=tuple(labels),
-        search_method=search_method,
-        plan=" | ".join(labels),
-        group_specs=group_specs,
-        mapping_strategies=strategies,
-        mapping_plan=mapping_plan.to_dict(),
+        traffic_bits_per_inference=traffic, total_traffic_bits_per_inference=sum(traffic.values()),
+        ops_per_chiplet=tuple(ops), stage_labels=tuple(labels), search_method=search_method,
+        plan=" | ".join(labels), group_specs=group_specs, mapping_strategies=strategies,
+        mapping_plan=plan.to_dict(), communication_events=events,
     )
 
 

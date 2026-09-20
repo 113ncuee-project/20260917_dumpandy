@@ -1,0 +1,96 @@
+{
+  "version": "ppa-only-tensor-ownership-dse-v3",
+  "results": 1,
+  "method": "tabular_q_learning_terminal_preference_reward",
+  "semantic_block_extraction": true,
+  "arbitrary_group_parallelization": true,
+  "intra_block_mapping": [
+    "single",
+    "output_channel",
+    "input_channel"
+  ],
+  "feasibility_checker": true,
+  "fps_role": "reported_only",
+  "traffic_model": "shared_tensor_ownership_events",
+  "spatial_mapping": "disabled_until_tile_metadata_is_available",
+  "dependency_aware_scheduler": true,
+  "outputs": [
+    "preference_search_results.json",
+    "preference_search_summary.csv"
+  ],
+  "configuration": {
+    "max_chiplets": 16,
+    "chiplet": {
+      "pe_rows": 8,
+      "pe_cols": 8,
+      "frequency_hz": 200000000,
+      "op_per_mac": 2,
+      "ops_per_pe_per_cycle": 2,
+      "utilization": 0.75,
+      "width_mm": 8.79772697916911,
+      "spacing_mm": 0.15,
+      "internal_latency_cycles": 3,
+      "phy_latency_cycles": 12,
+      "sram_mb": 16.0
+    },
+    "network": {
+      "link_bandwidth_bits_per_cycle": 0.3,
+      "link_latency_base_cycles": 1,
+      "link_latency_cycles_per_mm": 0.25
+    },
+    "power": {
+      "chiplet_static_w": 0.15,
+      "chiplet_peak_dynamic_w": 0.85,
+      "phy_w": 0.03,
+      "link_static_w_per_mm": 0.005,
+      "link_dynamic_pj_per_bit": 0.5
+    },
+    "rapidchiplet": {
+      "root": "C:\\Users\\user\\Downloads\\rapidchiplet-main (2)\\rapidchiplet-main",
+      "backend": "auto",
+      "chiplet_name": "dp_candidate"
+    },
+    "ppa": {
+      "max_latency_ns": 500000000.0,
+      "max_area_mm2": 800.0,
+      "max_power_w": 16.0
+    },
+    "search": {
+      "evaluation_budget": 128,
+      "max_episodes": 3000,
+      "seed": 20260919,
+      "learning_rate": 0.2,
+      "epsilon_start": 0.8,
+      "epsilon_end": 0.05,
+      "epsilon_decay": 0.99
+    },
+    "experiment": {
+      "kind": "network_limit_sensitivity_test",
+      "baseline_link_bandwidth_bits_per_cycle": 256.0,
+      "effective_link_bandwidth_bits_per_cycle": 0.3,
+      "source": "user-supplied 0815 hardware; FPS is output only"
+    }
+  },
+  "input_sha256": {
+    "C:\\Users\\user\\Desktop\\rapidchiplet\\audit_0917_snapshot\\simplified_rapidchiplet\\configs\\defaults.json": "d6d155cf78e9facf09a4f908e57999f7df5a991e65385010408b4eb30a74bdf8",
+    "C:\\Users\\user\\Desktop\\rapidchiplet\\audit_0917_snapshot\\simplified_rapidchiplet\\configs\\models.json": "31948c9410d584ba01f6a48f28d5d4fed7e3e916cc76d29101909788825a203e"
+  },
+  "source_sha256": {
+    "__init__.py": "063533f360cff8a2417dfbb99da9a3bbccf4a1f44bad379ede7d2d27ee143af2",
+    "block_extractor.py": "72295f5e9849de7b9328d0b004fe609e2b27babbec80723d99fcc6c7bc0fac43",
+    "communication.py": "bbd3c7be00408fce4699fca36479f978687cf46b4901b06d9f4c587d7f8dc995",
+    "config.py": "658a4e5629859f32176c9ac50c8ab64c16a51d42cde66a02c6da9d1f1a9605d2",
+    "dag_scheduler.py": "19f2c30ba976e13f1d72053691f0aae74a01d22d0b8c36b821a3cb7f0d6c0430",
+    "e2e_latency.py": "8383c719da04edeae2c7a2dc87fbfed44d4f3a134113e8a0c5f4bf33ecac57d3",
+    "evaluator.py": "8f9e0e37903da5c5f5713a7071d4e810a1f30d91e67fb3fbf85378b1141cb27d",
+    "mapping.py": "4793d08aa2ce3c8b8579a5219c8e4b55b996c2681888f258cf0eefec37f8fa83",
+    "model.py": "4229e1a130bcfa57d110b245b71be4ffa5a210f169e0471507392dd7496a58d1",
+    "preference_dse.py": "adc3d1384b6cb441a5da2d13e4db9d7eaf46eaa3685ce73c8070c1e4f1f09e15",
+    "rapid_proxy.py": "b1b9339991191f97aa82fa35322affc6c02996a54ba17ffe180d3bbe1fd9db67",
+    "rapidchiplet_engine.py": "1fc849aae9c012994da8f3af14102bbffc9306e1ce0a654bfca1325a06a1ca0c",
+    "report.py": "886be7a02100bc8495b95d0c92084494a437e122bee0cc36c8a76f8ee8d75472",
+    "routing.py": "ffafa662368e194ad7c8937e5aa3e63a850ba99acb39bbc9d6f101d0d3602bd1",
+    "topology.py": "2b263ef68725d6a4133052fbfedab4a4daebdc3471639b137d5b46908d21964b",
+    "workload.py": "f4f3690309969c68b70b1b10e4397bd5a9fde7cb1bc95cd01d36475586cb4ee6"
+  }
+}

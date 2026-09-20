@@ -13,7 +13,7 @@ The path latency uses the Rapid-compatible endpoint/relay/PHY formula on the
 same shortest-path-lowest-ID routing table used by this repository.
 
 The current block-level design also has intra-group mapping traffic for
-output-channel, input-channel, and spatial parallelism.  Those transfers are
+output-channel and input-channel parallelism. Those transfers are
 included as additional communication events so that a mapping action changes
 the E2E metric as well as Rapid's network diagnostic.
 
@@ -86,10 +86,10 @@ def estimate_batch1_e2e_latency(
     """Estimate one inference using group compute and communication events.
 
     ``workload.group_specs`` contains contiguous ``(start, end, chiplets)``
-    records.  Group boundaries use the reference project's all-to-all
-    boundary-flow construction.  Mapping traffic is evaluated separately as
-    an intra-group event, which preserves the semantics of the current RL
-    mapping action.
+    records. All transfers come from workload.communication_events, which
+    records the tensor ownership and required unicast copies. Rapid and the
+    DAG scheduler consume these same events. Events are serialized for this
+    conservative Batch=1 estimate, including parallel branches.
     """
 
     if not workload.group_specs:
@@ -97,7 +97,6 @@ def estimate_batch1_e2e_latency(
     if len(mapping_plan.groups) != len(workload.group_specs):
         raise ValueError("mapping plan and workload group count do not match")
 
-    group_chiplets = _group_chiplet_ids(workload.group_specs)
     group_compute_times_s = tuple(
         _group_compute_time_s(model, group, mapping_group, cfg)
         for group, mapping_group in zip(workload.group_specs, mapping_plan.groups)
@@ -113,66 +112,16 @@ def estimate_batch1_e2e_latency(
     event_times: list[float] = []
     boundary_timings: list[dict[str, object]] = []
 
-    # This is the reference E2E construction: each adjacent group boundary
-    # sends the boundary tensor from every source chiplet to every destination
-    # chiplet, with equal traffic per source/destination pair.
-    for group_index in range(len(workload.group_specs) - 1):
-        _start, next_start, _next_parts = workload.group_specs[group_index + 1]
-        boundary_mb = model.blocks[next_start - 1].output_mb
-        sources = group_chiplets[group_index]
-        destinations = group_chiplets[group_index + 1]
-        pair_count = max(1, len(sources) * len(destinations))
-        pair_bits = boundary_mb * BITS_PER_MB / pair_count
-        flows = tuple(
-            (source, destination, pair_bits)
-            for source in sources
-            for destination in destinations
-        )
+    for event in workload.communication_events:
+        flows = tuple((f["source"], f["target"], f["bits"]) for f in event["flows"])
         timing = _communication_event(
-            event_kind="group_boundary",
-            source_group_index=group_index,
-            destination_group_index=group_index + 1,
-            flows=flows,
-            routes=routes,
-            topology=topology,
-            cfg=cfg,
-            frequency_hz=frequency_hz,
+            event_kind=event["kind"], source_group_index=event["source_group_index"],
+            destination_group_index=event["destination_group_index"], flows=flows,
+            routes=routes, topology=topology, cfg=cfg, frequency_hz=frequency_hz,
             link_bandwidth_bits_per_cycle=link_bandwidth_bits_per_cycle,
-            nominal_traffic_bits=boundary_mb * BITS_PER_MB,
-            pair_count=pair_count,
+            nominal_traffic_bits=event["traffic_bits"], pair_count=len(flows),
         )
-        event_times.append(float(timing["service_s"]))
-        boundary_timings.append(timing)
-
-    # Parallel mapping creates a second class of communication.  Treat all
-    # edges belonging to one mapping group as one event so simultaneous
-    # broadcasts/reductions use the same bottleneck-link rule as a boundary.
-    mapping_flows_by_group: dict[int, list[tuple[int, int, float]]] = {}
-    for edge in mapping_plan.traffic_edges:
-        group_index = int(edge["group"])
-        source = int(edge["source"])
-        target = int(edge["target"])
-        bits = float(edge["mb"]) * BITS_PER_MB
-        if bits > 0.0 and source != target:
-            mapping_flows_by_group.setdefault(group_index, []).append(
-                (source, target, bits)
-            )
-
-    for group_index in sorted(mapping_flows_by_group):
-        flows = tuple(mapping_flows_by_group[group_index])
-        timing = _communication_event(
-            event_kind="intra_group_mapping",
-            source_group_index=group_index,
-            destination_group_index=group_index,
-            flows=flows,
-            routes=routes,
-            topology=topology,
-            cfg=cfg,
-            frequency_hz=frequency_hz,
-            link_bandwidth_bits_per_cycle=link_bandwidth_bits_per_cycle,
-            nominal_traffic_bits=sum(flow[2] for flow in flows),
-            pair_count=len(flows),
-        )
+        timing.update({k: event[k] for k in ("event_id", "source_block", "destination_block", "tensor", "flows")})
         event_times.append(float(timing["service_s"]))
         boundary_timings.append(timing)
 
@@ -187,10 +136,11 @@ def estimate_batch1_e2e_latency(
     estimated_e2e_latency_s = compute_latency_sum_s + communication_latency_sum_s
 
     compute_interval_s = max(group_compute_times_s, default=0.0)
-    pipeline_interval_s = max(
-        (*group_compute_times_s, *event_times),
-        default=0.0,
-    )
+    # Every group serially services its compute and incoming/internal events.
+    group_service = list(group_compute_times_s)
+    for timing in boundary_timings:
+        group_service[int(timing["destination_group_index"])] += float(timing["service_s"])
+    pipeline_interval_s = max(group_service, default=0.0)
     compute_limited_fps = (
         1.0 / compute_interval_s if compute_interval_s > 0.0 else math.inf
     )
@@ -212,7 +162,7 @@ def estimate_batch1_e2e_latency(
         compute_limited_fps=compute_limited_fps,
         pipeline_initiation_interval_s=pipeline_interval_s,
         pipeline_fps=pipeline_fps,
-        path_latency_source="rapid_compatible_per_flow_splif_reconstruction",
+        path_latency_source="shared_tensor_events_configured_links_v1",
     )
 
 

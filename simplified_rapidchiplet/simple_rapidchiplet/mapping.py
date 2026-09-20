@@ -8,17 +8,17 @@ strategy creates.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
+from functools import lru_cache
 from typing import Literal
 
 from .model import ModelSpec
 
 
-MappingStrategy = Literal["single", "output_channel", "input_channel", "spatial"]
+MappingStrategy = Literal["single", "output_channel", "input_channel"]
 PARALLEL_MAPPING_STRATEGIES: tuple[MappingStrategy, ...] = (
     "output_channel",
     "input_channel",
-    "spatial",
 )
 ALL_MAPPING_STRATEGIES: tuple[MappingStrategy, ...] = (
     "single",
@@ -101,7 +101,8 @@ def build_mapping_plan(
     The traffic values are architecture-level estimates.  They are not a
     replacement for a cycle-accurate accelerator simulator, but unlike
     ``MACs / N`` they expose the broadcast/reduction cost that distinguishes
-    output-channel, input-channel, and spatial parallelism.
+    output-channel and input-channel parallelism. Spatial tiling is disabled
+    until tile shapes, halo overlap and ownership metadata are available.
     """
 
     if not groups:
@@ -133,11 +134,28 @@ def build_mapping_plan(
 
         strategy = _normalise_strategy(requested_strategy, parts)
         blocks = model.blocks[start:end]
-        input_mb = max(blocks[0].input_mb, blocks[0].output_mb)
+        input_mb = blocks[0].input_mb
         output_mb = blocks[-1].output_mb
         weight_mb = sum(block.weight_mb for block in blocks)
-        memory_per_chiplet_mb = max(input_mb, output_mb) + weight_mb / parts
+        # Conservative resident weights + full live input and two activation
+        # buffers (also covers residual input retention). No DRAM streaming.
+        live_mb = max(b.input_mb + 2 * max((b.output_mb, b.reduction_output_mb, b.peak_activation_mb,
+                                          *b.internal_activation_mb)) for b in blocks)
+        linear_graph = all(b.depends_on == ((model.blocks[i-1].name,) if i else ())
+                           for i, b in enumerate(model.blocks))
+        if not linear_graph:
+            # A branching group can retain several tensors simultaneously.
+            # Reserve all its inputs/outputs conservatively, rather than
+            # pretending the largest single block bounds DAG liveness.
+            by_name = {b.name: b for b in model.blocks}
+            inputs = {name for b in blocks for name in b.depends_on}
+            live_mb = max(live_mb, sum(by_name[name].output_mb for name in inputs)
+                + sum(b.output_mb + (b.input_mb if not b.depends_on else 0.) for b in blocks)
+                + 2 * max((max((b.output_mb,b.reduction_output_mb,*b.internal_activation_mb)) for b in blocks)))
+        memory_per_chiplet_mb = live_mb + weight_mb / parts
         violations: list[str] = []
+        if any(strategy not in b.supported_mappings for b in blocks):
+            violations.append(f"group {group_index}: {strategy} is not validated for these operators")
         if memory_per_chiplet_mb > sram_mb:
             violations.append(
                 f"group {group_index} needs {memory_per_chiplet_mb:.3f} MB/chiplet "
@@ -147,9 +165,12 @@ def build_mapping_plan(
             violations.append(f"group {group_index} uses multiple chiplets with single mapping")
         if parts > 1 and any(block.block_type.lower() == "head" for block in blocks):
             violations.append(f"group {group_index} contains a non-parallelizable Head block")
+        channels = [b.input_parallel_channels if strategy == "input_channel" else b.parallel_channels for b in blocks]
+        if any(c and (parts > c or c % parts) for c in channels):
+            violations.append(f"group {group_index} cannot split known channels equally into {parts} parts")
 
         efficiency = _compute_efficiency(strategy, parts)
-        extra_traffic_mb = _extra_traffic_mb(strategy, parts, input_mb, output_mb)
+        extra_traffic_mb = 0.0  # populated from the shared tensor events below
         partition = _partition_description(strategy, parts, input_mb, output_mb)
         result = MappingGroupResult(
             group_index=group_index,
@@ -170,36 +191,19 @@ def build_mapping_plan(
         group_results.append(result)
         all_violations.extend(violations)
 
-        if parts > 1 and extra_traffic_mb > 0.0:
-            chiplet_start = sum(previous.chiplets for previous in group_results[:-1])
-            if strategy == "input_channel":
-                representative = chiplet_start
-                for part in range(1, parts):
-                    traffic_edges.append(
-                        {
-                            "source": chiplet_start + part,
-                            "target": representative,
-                            "mb": output_mb,
-                            "kind": "partial_output_reduction",
-                            "group": group_index,
-                        }
-                    )
-            else:
-                representative = chiplet_start
-                for part in range(1, parts):
-                    traffic_edges.append(
-                        {
-                            "source": representative,
-                            "target": chiplet_start + part,
-                            "mb": extra_traffic_mb / (parts - 1),
-                            "kind": "input_broadcast" if strategy == "output_channel" else "spatial_halo_exchange",
-                            "group": group_index,
-                        }
-                    )
         cursor = end
 
     if require_full_coverage and cursor != len(model.blocks):
         raise ValueError("mapping groups must cover every model block")
+    if require_full_coverage:
+        from .communication import build_communication_events
+        events = build_communication_events(model, groups, tuple(g.strategy for g in group_results))
+        traffic_edges = [dict(source=f["source"], target=f["target"], mb=f["bits"] / (8 * BYTES_PER_MB),
+                              kind=e["kind"], group=e["destination_group_index"], event_id=e["event_id"])
+                         for e in events if e["source_group_index"] == e["destination_group_index"]
+                         for f in e["flows"]]
+        group_results = [replace(g, extra_traffic_mb=sum(float(e["mb"]) for e in traffic_edges
+                                                        if e["group"] == g.group_index)) for g in group_results]
     return MappingPlan(
         feasible=not all_violations,
         violations=tuple(all_violations),
@@ -208,6 +212,7 @@ def build_mapping_plan(
     )
 
 
+@lru_cache(maxsize=32768)
 def mapping_action_is_feasible(
     model: ModelSpec,
     start: int,
@@ -245,26 +250,8 @@ def _compute_efficiency(strategy: MappingStrategy, parts: int) -> float:
     base = {
         "output_channel": 0.95,
         "input_channel": 0.85,
-        "spatial": 0.90,
     }[strategy]
     return base - min(0.15, 0.01 * max(0, parts - 2))
-
-
-def _extra_traffic_mb(
-    strategy: MappingStrategy,
-    parts: int,
-    input_mb: float,
-    output_mb: float,
-) -> float:
-    if parts <= 1:
-        return 0.0
-    if strategy == "output_channel":
-        return input_mb * (parts - 1)
-    if strategy == "input_channel":
-        return output_mb * (parts - 1)
-    if strategy == "spatial":
-        return input_mb * 0.25 * (parts - 1)
-    return 0.0
 
 
 def _partition_description(

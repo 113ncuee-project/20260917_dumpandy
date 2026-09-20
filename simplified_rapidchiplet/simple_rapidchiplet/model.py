@@ -18,6 +18,15 @@ class Stage:
     operators: tuple[str, ...] = ()
     branch_closed: bool = True
     source_stage: str = ""
+    internal_activation_mb: tuple[float, ...] = ()
+    projection_shortcut: bool = False
+    parallel_channels: int = 0
+    input_parallel_channels: int = 0
+    reduction_output_mb: float = 0.0
+    residual_shortcut: bool = False
+    supported_mappings: tuple[str, ...] = ("single", "output_channel", "input_channel")
+    input_partition: str = "replicated"
+    peak_activation_mb: float = 0.0
 
 
 # ``Stage`` is kept as the public compatibility name used by the original
@@ -72,6 +81,15 @@ class ModelSpec:
                 "operators": list(block.operators),
                 "branch_closed": block.branch_closed,
                 "source_stage": block.source_stage,
+                "internal_activation_mb": list(block.internal_activation_mb),
+                "reduction_output_mb": block.reduction_output_mb,
+                "projection_shortcut": block.projection_shortcut,
+                "residual_shortcut": block.residual_shortcut,
+                "parallel_channels": block.parallel_channels,
+                "input_parallel_channels": block.input_parallel_channels,
+                "supported_mappings": list(block.supported_mappings),
+                "input_partition": block.input_partition,
+                "peak_activation_mb": block.peak_activation_mb,
             }
             for index, block in enumerate(self.blocks)
         ]
@@ -146,6 +164,15 @@ def load_models(path: str | Path) -> dict[str, ModelSpec]:
                     operators=tuple(str(value) for value in block.get("operators", (names[index],))),
                     branch_closed=bool(block.get("branch_closed", True)),
                     source_stage=str(block.get("source_stage", "")),
+                    internal_activation_mb=tuple(float(x) for x in block.get("internal_activation_mb", ())),
+                    projection_shortcut=bool(block.get("projection_shortcut", False)),
+                    parallel_channels=int(block.get("parallel_channels", 0)),
+                    input_parallel_channels=int(block.get("input_parallel_channels", 0)),
+                    reduction_output_mb=float(block.get("reduction_output_mb", 0)),
+                    residual_shortcut=bool(block.get("residual_shortcut", False)),
+                    supported_mappings=tuple(block.get("supported_mappings", ("single", "output_channel", "input_channel"))),
+                    input_partition=str(block.get("input_partition", "replicated")),
+                    peak_activation_mb=float(block.get("peak_activation_mb", 0.0)),
                 )
             )
         stages = tuple(stages_list)

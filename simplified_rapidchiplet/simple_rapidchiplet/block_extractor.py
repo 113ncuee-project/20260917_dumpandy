@@ -17,6 +17,7 @@ and the compatibility fallback for old stage-only configs.
 from __future__ import annotations
 
 from dataclasses import dataclass
+import math
 
 from .model import ModelSpec, refine_model_blocks
 
@@ -47,13 +48,25 @@ def validate_block_graph(model: ModelSpec) -> None:
     """Validate IDs, dependencies and semantic boundary invariants."""
 
     blocks = model.blocks
+    if not blocks:
+        raise ValueError(f"Model {model.name} has no blocks")
     names = {block.name for block in blocks}
     if len(names) != len(blocks):
         raise ValueError(f"Model {model.name} has duplicate block names")
 
     for block in blocks:
-        if block.macs_g < 0.0 or block.output_mb < 0.0:
-            raise ValueError(f"Block {block.name} has a negative compute/output size")
+        sizes = (block.macs_g, block.input_mb, block.output_mb, block.weight_mb,
+                 block.reduction_output_mb, block.peak_activation_mb, *block.internal_activation_mb)
+        if any(not math.isfinite(v) or v < 0 for v in sizes):
+            raise ValueError(f"Block {block.name} requires finite nonnegative compute/tensor sizes")
+        if len(set(block.depends_on)) != len(block.depends_on):
+            raise ValueError(f"Block {block.name} repeats a dependency")
+        if block.parallel_channels < 0 or block.input_parallel_channels < 0:
+            raise ValueError(f"Block {block.name} has a negative channel count")
+        if not block.supported_mappings or set(block.supported_mappings) - {"single", "output_channel", "input_channel"}:
+            raise ValueError(f"Block {block.name} has invalid mapping support")
+        if block.input_partition not in ("replicated", "channel"):
+            raise ValueError(f"Block {block.name} has invalid input partition")
         if not block.operators:
             raise ValueError(f"Block {block.name} must contain at least one fused operator")
         if model.block_source == "semantic" and not block.branch_closed:

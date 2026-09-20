@@ -45,8 +45,7 @@ def compute_latency(
         latency = 1.0 + node_latency
         for a, b in zip(path, path[1:]):
             length = edge_lengths[tuple(sorted((a, b)))]
-            latency += network.link_latency_base_cycles
-            latency += network.link_latency_cycles_per_mm * length
+            latency += math.ceil(network.link_latency_base_cycles + network.link_latency_cycles_per_mm * length)
             if b != dst:
                 latency += relay_latency
         latency += node_latency + 2.0

@@ -16,7 +16,6 @@ CSV_FIELDS = [
     "used_chiplets",
     "unused_chiplets",
     "status",
-    "target_fps",
     "achieved_fps",
     "area_mm2",
     "power_w",
@@ -25,9 +24,6 @@ CSV_FIELDS = [
     "rapidchiplet_throughput_bits_per_cycle",
     "ppa_goal",
     "ppa_score",
-    "fps_penalty",
-    "fps_bonus",
-    "miss_reason",
     "workload_plan",
 ]
 
@@ -79,8 +75,7 @@ def _csv_row(row: EvaluationResult) -> dict[str, object]:
         "total_chiplets": row.available_chiplets,
         "used_chiplets": row.selected_chiplets,
         "unused_chiplets": row.unused_chiplets,
-        "status": "MET" if row.target_met else "MISS",
-        "target_fps": _csv_float(row.target_fps),
+        "status": "ARCH_VALID" if row.architecture_feasible else "ARCH_INVALID",
         "achieved_fps": _csv_float(row.achieved_fps),
         "area_mm2": _csv_float(row.total_area_mm2),
         "power_w": _csv_float(row.total_power_w),
@@ -89,9 +84,6 @@ def _csv_row(row: EvaluationResult) -> dict[str, object]:
         "rapidchiplet_throughput_bits_per_cycle": _csv_float(row.aggregate_throughput_bits_per_cycle),
         "ppa_goal": row.ppa_goal,
         "ppa_score": _csv_float(row.ppa_score),
-        "fps_penalty": _csv_float(row.fps_penalty),
-        "fps_bonus": _csv_float(row.fps_bonus),
-        "miss_reason": row.miss_reason,
         "workload_plan": row.workload_plan,
     }
 
@@ -402,15 +394,12 @@ def _table_header() -> str:
     return """<tr>
           <th>Model</th>
           <th>Topology</th>
-          <th>Status</th>
+          <th>Architecture status</th>
           <th>Chiplets</th>
-          <th>Required TOPS</th>
           <th>FPS</th>
           <th>Area mm^2</th>
           <th>Power W</th>
           <th>PPA Score</th>
-          <th>FPS Penalty</th>
-          <th>FPS Bonus</th>
           <th>E2E latency ns</th>
           <th>Bottleneck Link</th>
           <th>Search</th>
@@ -419,22 +408,19 @@ def _table_header() -> str:
 
 
 def _html_row(row: EvaluationResult, max_perf: float, max_power: float) -> str:
-    status = "met" if row.target_met else "miss"
-    status_class = "ok" if row.target_met else "bad"
+    status = "arch valid" if row.architecture_feasible else "arch invalid"
+    status_class = "ok" if row.architecture_feasible else "bad"
     perf_width = _pct(row.achieved_fps, max_perf)
     power_width = _pct(row.total_power_w, max_power)
     return f"""<tr>
   <td>{html.escape(row.model)}</td>
   <td>{html.escape(row.topology)}</td>
   <td class="status {status_class}">{status}</td>
-  <td>{row.selected_chiplets}/{row.available_chiplets} <span style="color:#657280">(compute {row.compute_only_chiplets}, unused {row.unused_chiplets})</span></td>
-  <td>{row.required_tops:.3f}</td>
+  <td>{row.selected_chiplets}/{row.available_chiplets} <span style="color:#657280">(unused {row.unused_chiplets})</span></td>
   <td>{row.achieved_fps:.1f}<span class="bar perf"><span style="width:{perf_width}%"></span></span></td>
   <td>{row.total_area_mm2:.2f}</td>
   <td>{row.total_power_w:.2f}<span class="bar power"><span style="width:{power_width}%"></span></span></td>
   <td>{row.ppa_score:.3f} <span style="color:#657280">({html.escape(row.ppa_goal)})</span></td>
-  <td>{row.fps_penalty:.3f}</td>
-  <td>{row.fps_bonus:.3f}</td>
   <td>{row.avg_latency_ns:.2f}</td>
   <td>{html.escape(row.bottleneck_link)}</td>
   <td>{html.escape(row.workload_search)}</td>
@@ -449,7 +435,10 @@ def _partition_card(row: EvaluationResult) -> str:
     if not nodes:
         return ""
 
-    traffic_by_source = {int(edge["source"]): float(edge["mb"]) for edge in traffic_edges}
+    traffic_by_source = {}
+    for edge in traffic_edges:
+        source = int(edge["source"])
+        traffic_by_source[source] = traffic_by_source.get(source, 0.0) + float(edge["mb"])
     max_ops = max((float(node.get("ops", 0.0)) for node in nodes), default=1.0)
     node_tiles = []
     for node in sorted(nodes, key=lambda item: int(item["id"])):
@@ -471,7 +460,7 @@ def _partition_card(row: EvaluationResult) -> str:
 
     return f"""<section class="partition-card">
   <h3>{html.escape(row.model)} / {html.escape(row.topology)}</h3>
-  <p>{row.selected_chiplets} active chiplets, PPA score {row.ppa_score:.3f}, FPS penalty {row.fps_penalty:.3f}, FPS bonus {row.fps_bonus:.3f}, {html.escape(row.ppa_goal)} goal.</p>
+  <p>{row.selected_chiplets} active chiplets, PPA score {row.ppa_score:.3f}, {html.escape(row.ppa_goal)} goal.</p>
   <div class="partition-strip">
     {"".join(node_tiles)}
   </div>

@@ -17,10 +17,11 @@ if (-not $Python) {
 }
 
 if ($UsePyLauncher) {
-    & $Python.Source -3 .\run.py --models shufflenet_v2_x1_0 --ppa-goal balanced --workload-search pareto-dp --dp-top-k 12 --out .\results\demo
+    & $Python.Source -3 .\run.py --preference balanced --out .\results\demo
 } else {
-    & $Python.Source .\run.py --models shufflenet_v2_x1_0 --ppa-goal balanced --workload-search pareto-dp --dp-top-k 12 --out .\results\demo
+    & $Python.Source .\run.py --preference balanced --out .\results\demo
 }
 
 Write-Host ""
-Write-Host "完成。請打開 results\demo\report.html 查看報告。"
+if ($LASTEXITCODE -ne 0) { throw "DSE 執行失敗，請查看上方錯誤。" }
+Write-Host "完成。請打開 results\demo\preference_search_summary.csv 與 preference_search_results.json。"

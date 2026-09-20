@@ -104,6 +104,12 @@ def schedule_block_dag(
             mapping_plan=mapping_plan,
         )
 
+    from .workload import build_pipeline_workload
+    from .e2e_latency import estimate_batch1_e2e_latency
+    workload = build_pipeline_workload(model, cfg.chiplet.op_per_mac, groups,
+                                       mapping_strategies=mapping_strategies)
+    events = estimate_batch1_e2e_latency(model, workload, mapping_plan, topology, cfg).boundary_timings
+
     group_for_block: dict[int, int] = {}
     chiplets_for_group: dict[int, tuple[int, ...]] = {}
     for group_index, (start, end, parts) in enumerate(groups):
@@ -128,7 +134,8 @@ def schedule_block_dag(
         * cfg.chiplet.ops_per_pe_per_cycle
         * cfg.chiplet.utilization
     )
-    ready_counts: list[int] = []
+    blocking_parent: dict[str, str | None] = {}
+    last_task_by_chiplet: dict[int, str] = {}
 
     for block_index in order:
         block = model.blocks[block_index]
@@ -136,22 +143,14 @@ def schedule_block_dag(
         mapping_group = mapping_plan.groups[group_index]
         chiplet_ids = chiplets_for_group[group_index]
         predecessors = tuple(block.depends_on)
-        ready_predecessors = sum(name in finish_by_block for name in predecessors)
-        ready_counts.append(ready_predecessors)
         predecessor_ready = 0.0
         incoming_comm = 0.0
         latest_predecessor: str | None = None
         for predecessor in predecessors:
             predecessor_finish = finish_by_block[predecessor]
-            predecessor_index = next(
-                index for index, candidate in enumerate(model.blocks) if candidate.name == predecessor
-            )
-            same_group = group_for_block[predecessor_index] == group_index
-            comm_cycles = 0.0 if same_group else _communication_cycles(
-                model.blocks[predecessor_index].output_mb,
-                cfg,
-                topology,
-            )
+            comm_cycles = sum(float(e["service_s"]) * cfg.chiplet.frequency_hz
+                              for e in events if e["kind"] == "dependency_transfer"
+                              and e["source_block"] == predecessor and e["destination_block"] == block.name)
             candidate_ready = predecessor_finish + comm_cycles
             if candidate_ready >= predecessor_ready:
                 predecessor_ready = candidate_ready
@@ -166,11 +165,19 @@ def schedule_block_dag(
             / max(1, mapping_group.chiplets)
             / max(base_ops_per_cycle * efficiency, 1e-12)
         )
+        duration += sum(float(e["service_s"]) * cfg.chiplet.frequency_hz for e in events
+                        if e["destination_block"] == block.name and e["kind"] != "dependency_transfer")
         resource_ready = max((chiplet_ready[chiplet] for chiplet in chiplet_ids), default=0.0)
         start = max(predecessor_ready, resource_ready)
         finish = start + duration
+        parent = latest_predecessor
+        if resource_ready > predecessor_ready:
+            busy_chiplet = max(chiplet_ids, key=lambda node: chiplet_ready[node])
+            parent = last_task_by_chiplet.get(busy_chiplet)
+        blocking_parent[block.name] = parent
         for chiplet in chiplet_ids:
             chiplet_ready[chiplet] = finish
+            last_task_by_chiplet[chiplet] = block.name
 
         task = ScheduledBlock(
             name=block.name,
@@ -188,8 +195,11 @@ def schedule_block_dag(
         task_by_block[block.name] = task
 
     makespan = max(finish_by_block.values(), default=0.0)
-    critical_path = _critical_path(task_by_block)
-    concurrently_ready_pairs = sum(max(0, count - 1) for count in ready_counts)
+    critical_path = _critical_path(task_by_block, blocking_parent)
+    tasks = list(task_by_block.values())
+    concurrently_ready_pairs = sum(
+        max(left.start_cycles, right.start_cycles) < min(left.finish_cycles, right.finish_cycles)
+        for i, left in enumerate(tasks) for right in tasks[i+1:])
     return ScheduleResult(
         feasible=True,
         violations=(),
@@ -200,15 +210,6 @@ def schedule_block_dag(
         concurrently_ready_pairs=concurrently_ready_pairs,
         mapping_plan=mapping_plan,
     )
-
-
-def _communication_cycles(output_mb: float, cfg: EvalConfig, topology: Topology) -> float:
-    # Use one shortest-hop-equivalent transfer for the schedule estimate. The
-    # full traffic volume is still passed to RapidChiplet/local proxy.
-    hop_factor = 1.0 if topology.node_count <= 1 else 1.0 + topology.node_count.bit_length() / 4.0
-    bytes_per_transfer = max(0.0, output_mb) * BYTES_PER_MB
-    transfer_cycles = bytes_per_transfer * 8 / max(cfg.network.link_bandwidth_bits_per_cycle, 1e-12)
-    return transfer_cycles * hop_factor + cfg.network.link_latency_base_cycles + cfg.chiplet.phy_latency_cycles
 
 
 def _topological_order(model: ModelSpec) -> tuple[int, ...]:
@@ -233,16 +234,13 @@ def _topological_order(model: ModelSpec) -> tuple[int, ...]:
     return tuple(order)
 
 
-def _critical_path(tasks: dict[str, ScheduledBlock]) -> tuple[str, ...]:
+def _critical_path(tasks: dict[str, ScheduledBlock], parents: dict[str, str | None]) -> tuple[str, ...]:
     if not tasks:
         return ()
     current = max(tasks.values(), key=lambda task: task.finish_cycles)
     path = [current.name]
-    while current.predecessors:
-        predecessor = max(
-            (tasks[name] for name in current.predecessors),
-            key=lambda task: task.finish_cycles,
-        )
+    while parents[current.name] is not None:
+        predecessor = tasks[parents[current.name]]
         path.append(predecessor.name)
         current = predecessor
     path.reverse()

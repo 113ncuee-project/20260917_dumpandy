@@ -1,6 +1,5 @@
 {
   "evaluation": {
-    "target_fps": 15,
     "max_chiplets": 16
   },
   "chiplet": {
@@ -17,7 +16,7 @@
     "sram_mb": 16.0
   },
   "network": {
-    "link_bandwidth_bits_per_cycle": 256,
+    "link_bandwidth_bits_per_cycle": 0.3,
     "link_latency_base_cycles": 1,
     "link_latency_cycles_per_mm": 0.25
   },
@@ -29,14 +28,32 @@
     "link_dynamic_pj_per_bit": 0.5
   },
   "rapidchiplet": {
-    "root": "C:\\Users\\user\\Downloads\\rapidchiplet-main (2)\\rapidchiplet-main",
-    "technology_file": "inputs\\technologies\\example_technologies.json",
-    "chiplet_file": "inputs\\chiplets\\chiplets_example_experiment.json",
-    "chiplet_name": "example_experiment",
-    "packaging_file": "inputs\\packagings\\example_packaging.json",
-    "technology": "tech_1",
-    "chiplet_power_w": 20.5,
-    "fraction_power_bumps": 0.5,
-    "phy_fraction_bump_area": 0.25
+    "root": "../.runtime/rapidchiplet",
+    "backend": "official"
+  },
+  "ppa": {
+    "max_latency_ns": 500000000.0,
+    "max_area_mm2": 800.0,
+    "max_power_w": 16.0
+  },
+  "strict_constraints": {
+    "latency": true,
+    "area": true,
+    "power": true
+  },
+  "search": {
+    "evaluation_budget": 128,
+    "max_episodes": 3000,
+    "seed": 20260919,
+    "learning_rate": 0.2,
+    "epsilon_start": 0.8,
+    "epsilon_end": 0.05,
+    "epsilon_decay": 0.99
+  },
+  "experiment": {
+    "kind": "network_limit_sensitivity_test",
+    "baseline_link_bandwidth_bits_per_cycle": 256.0,
+    "effective_link_bandwidth_bits_per_cycle": 0.3,
+    "source": "user-supplied 0815 hardware; FPS is output only"
   }
 }
