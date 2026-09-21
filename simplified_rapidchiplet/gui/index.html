@@ -4,7 +4,7 @@
 <title>Chiplet Lab · PPA 設計探索</title><link rel="stylesheet" href="/style.css"><script src="/app.js" defer></script></head>
 <body>
 <header><a class="brand" href="/" aria-label="Chiplet Lab 首頁"><span class="brand-icon">▦</span> CHIPLET <strong>LAB</strong></a>
-<span class="header-note">0917 · Design space exploration</span><span class="connection" id="connection">連線中</span></header>
+<span class="header-note">0920 · Design space exploration</span><span class="connection" id="connection">連線中</span></header>
 <main>
 <div class="page-heading"><div><p class="eyebrow">FROM MODEL TO CHIPLET</p><h1>把你的 PPA 目標，變成可檢視的設計。</h1><p class="muted">選擇模型與偏好，探索分組及 mapping，查看實際放置與資料傳輸路徑。</p></div><span class="pill">Batch 1 · FP32 · 224 × 224</span></div>
 <div class="workspace">
@@ -37,7 +37,7 @@
 <div id="empty-state" class="panel empty-state"><div class="empty-icon">▦</div><h2>每一條連線，都來自實際候選設計。</h2><p>執行探索後，這裡會顯示 chiplet 放置、實體 links、<br>tensor traffic 路由，以及各項 PPA 結果。</p><div class="empty-tags"><span>真實座標</span><span>依 tensor 追蹤</span><span>逐項限制</span></div></div>
 <div id="result-content" hidden>
 <div class="result-meta"><span id="result-status" class="pill"></span><span id="result-subtitle" class="muted"></span></div>
-<div class="metrics" id="metrics"></div>
+<div class="metrics" id="metrics"></div><p class="notice">Power = 單次推論能量 ÷ Batch-1 觀測時間；使用估計 active time，非峰值功率。Area 是放置外框。FPS 僅為輸出，嚴格限制套用於這些估計值。</p><section class="panel detail"><h2>Power 與 Area 組成</h2><div id="power-area-breakdown"></div></section>
 <section class="panel placement"><div class="panel-heading"><div><h2>Chiplet 放置與連線</h2><p id="graph-caption" class="hint"></p></div><label class="zoom-label">縮放 <input id="zoom" type="range" min="75" max="200" step="25" value="100" aria-label="放置圖縮放"></label></div>
 <div class="graph-controls"><label>Traffic <select id="event-select" aria-label="選擇 tensor 通訊事件"><option value="physical">僅實體連線</option></select></label><button id="export-svg" class="text-button" type="button">匯出 SVG ↓</button></div>
 <div class="graph-scroll"><svg id="placement-svg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="候選設計實際 chiplet 放置與連線"></svg></div>

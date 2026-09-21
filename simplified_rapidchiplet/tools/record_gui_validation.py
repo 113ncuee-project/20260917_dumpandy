@@ -44,13 +44,15 @@ def main():
                 replay_converged=result['policy_rollout']['replay_converged'],
                 best_reward=result['best_reward'],all_targets_met=b['feasible'] if b else False,
                 chiplets=c['selected_chiplets'] if c else None,power_w=c['total_power_w'] if c else None,
+                energy_per_inference_j=c['energy_per_inference_j'] if c else None,
+                power_fixed_utilization_w=c['power_fixed_utilization_w'] if c else None,
                 area_mm2=c['total_area_mm2'] if c else None,latency_ms=c['avg_latency_ns']/1e6 if c else None,
                 fps_reported=c['achieved_fps'] if c else None,bonus=b['bonus'] if b else None,penalty=b['penalty'] if b else None,
                 backend=c['backend'] if c else None))
         records.append(record)
     out=ROOT/'validation/gui_multimodel_validation.json'
     out.write_text(json.dumps(dict(date=datetime.now().astimezone().date().isoformat(),execution='Real browser GUI jobs on local official RapidChiplet',
-        unit_tests=dict(passed=67,command='python -m unittest discover -s tests'),
+        unit_tests=dict(passed=79,command='python -m unittest discover -s tests'),
         note='CPU model forward validates graph metadata, not measured chiplet PPA or classification accuracy.',
         cases=records),ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     print(out)

@@ -203,12 +203,13 @@ class Application:
                 (directory / "results.json").write_text(json.dumps(_json_safe(export), ensure_ascii=False, indent=2), encoding="utf-8")
                 with (directory / "summary.csv").open("w", newline="", encoding="utf-8-sig") as handle:
                     writer = csv.writer(handle)
-                    writer.writerow(["model", "status", "all_limits_met", "reward", "chiplets", "power_w", "area_mm2", "latency_ms", "fps", "bonus", "penalty"])
+                    writer.writerow(["model", "status", "all_limits_met", "reward", "chiplets", "power_w", "area_mm2", "latency_ms", "fps", "bonus", "penalty", "power_fixed_utilization_w", "energy_per_inference_j"])
                     for r in full_results:
                         c, b = r["best_candidate"], r["best_breakdown"]
                         writer.writerow([r["model"], r["status"], b["feasible"] if b else False, r["best_reward"],
                             c["selected_chiplets"] if c else "", c["total_power_w"] if c else "", c["total_area_mm2"] if c else "",
-                            c["avg_latency_ns"] / 1e6 if c else "", c["achieved_fps"] if c else "", b["bonus"] if b else "", b["penalty"] if b else ""])
+                            c["avg_latency_ns"] / 1e6 if c else "", c["achieved_fps"] if c else "", b["bonus"] if b else "", b["penalty"] if b else "",
+                            c["power_fixed_utilization_w"] if c else "", c["energy_per_inference_j"] if c else ""])
                 job["download_ready"] = True
             except Exception as exc:
                 job["errors"].append(dict(model="export", message=str(exc)))

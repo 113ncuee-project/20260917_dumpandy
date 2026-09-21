@@ -121,8 +121,8 @@ function renderResult(){
   $("result-status").className="pill "+(b.feasible?"good":"warning");
   $("result-status").textContent=b.feasible?"三項 PPA 均達標":"可接受 · 含軟限制超標";
   $("result-subtitle").textContent=`${c.selected_chiplets} chiplets · ${r.unique_evaluations} 個設計 · backend: ${c.backend}`;
-  const metrics=[{key:"power",label:"Power",value:c.total_power_w,limit:r.preference.max_power_w,unit:"W"},
-    {key:"area",label:"Area",value:c.total_area_mm2,limit:r.preference.max_area_mm2,unit:"mm²"},
+  const metrics=[{key:"power",label:"Power（Batch-1 平均）",value:c.total_power_w,limit:r.preference.max_power_w,unit:"W"},
+    {key:"area",label:"Area（配置外框）",value:c.total_area_mm2,limit:r.preference.max_area_mm2,unit:"mm²"},
     {key:"latency",label:"Batch-1 Latency",value:c.avg_latency_ns/1e6,limit:r.preference.max_latency_ns/1e6,unit:"ms"}];
   $("metrics").innerHTML=metrics.map(m=>{
     const over=m.value>m.limit;return `<div class="metric"><div class="metric-label"><span>${m.label}</span><span>${r.preference["strict_"+m.key]?"嚴格":"軟限制"}</span></div><div class="metric-value${over?" over":""}">${fmt(m.value)}<small>${m.unit}</small></div><div class="metric-note${over?" over":""}">上限 ${fmt(m.limit,2)} · ${over?"超出":"餘裕"} ${fmt(Math.abs(m.value/m.limit-1)*100,1)}%</div></div>`;
@@ -133,6 +133,16 @@ function renderResult(){
     c.communication_events.map((e,i)=>`<option value="${i}">#${e.event_id} ${esc(kinds[e.kind]||e.kind)} · ${esc(e.tensor)}</option>`).join("");
   $("chiplet-info").textContent="點選 chiplet 查看配置、座標與工作量。";
   drawGraph();
+  $("power-area-breakdown").innerHTML=row("Batch-1 平均功率",fmt(c.power_avg_batch1_w,6)+" W",true)+
+    row("Energy / inference",fmt(c.energy_per_inference_j*1e3,6)+" mJ")+
+    row("Static energy",fmt(c.static_energy_j*1e3,6)+" mJ")+
+    row("Compute dynamic energy",fmt(c.compute_dynamic_energy_j*1e3,6)+" mJ")+
+    row("Link dynamic energy",fmt(c.link_dynamic_energy_j*1e6,3)+" µJ")+
+    row("Batch-1 observation window",fmt(c.power_observation_window_s*1e3,6)+" ms")+
+    row("Static power（chiplet／PHY／links／router）",fmt(c.static_power_w,6)+" W")+
+    row("Fixed-utilization hardware power estimate",fmt(c.power_fixed_utilization_w,6)+" W")+
+    row("Die 面積總和",fmt(c.total_chiplet_area_mm2,3)+" mm²")+
+    row("配置外框（PPA Area）",fmt(c.total_area_mm2,3)+" mm²");
   $("latency-breakdown").innerHTML=row("Compute",fmt(c.e2e_compute_latency_ns/1e6)+" ms")+
     row("Link serialization",fmt(c.e2e_communication_serialization_ns/1e6)+" ms")+
     row("Path delay",fmt(c.e2e_communication_path_latency_ns/1e6,6)+" ms")+
@@ -143,7 +153,7 @@ function renderResult(){
   $("mapping-table").innerHTML=c.mapping_plan.groups.map(g=>`<tr><td>G${g.group_index}</td><td class="wrap">${esc(c.block_graph.nodes.slice(g.start_block,g.end_block).map(n=>n.name).join(" → "))}</td><td>${g.chiplets}</td><td>${esc(strategies[g.strategy])}</td><td>${fmt(g.memory_per_chiplet_mb,2)} / ${fmt(c.effective_hardware.chiplet.sram_mb,0)} MiB</td></tr>`).join("");
   const m=r.model_metadata;
   const stopping={evaluation_budget:"已用完評估預算",episode_limit:"已達 episode 上限",design_space_exhausted:"已評估全部合法設計"};
-  $("audit-details").innerHTML=`<p>${esc(m.description)}</p><p>參數 ${fmt(m.parameters,0)} · FP32 權重 ${fmt(m.fp32_weights_mib,3)} MiB · Conv/Linear MAC ${fmt(m.macs_g,6)} G · ${m.blocks} blocks</p><p>PyTorch ${esc(m.calibration.torch)} / torchvision ${esc(m.calibration.torchvision)}；實際 CPU forward 已校驗，未載入預訓練權重，未評量準確率。<a href="${esc(m.calibration.source)}" target="_blank" rel="noopener">官方架構來源 ↗</a></p><p>停止原因：${esc(stopping[r.stopping_reason]||r.stopping_reason)} · ${r.episodes} episodes · seed ${r.seed}<br>搜尋空間 ${fmt(r.design_space_size,0)}；已評估 ${r.unique_evaluations}。${r.global_optimum_certified?"已完整枚舉此受限空間。":"結果為已評估設計中的最佳值，不保證全域最佳。"}<br>Q greedy policy 與最佳已評估 reward：${r.policy_rollout.matches_best_reward?"相符":"不同"}。固定 mesh 座標；RL 未搜尋任意拓撲或擺放。</p><p>權重、利用率、mapping 效率與記憶體為分析模型。Power 為固定利用率估計，link dynamic energy 另列 ${fmt(c.link_dynamic_energy_per_inference_j*1e6,3)} µJ / inference，未換算為 dynamic power。</p>`;
+  $("audit-details").innerHTML=`<p>${esc(m.description)}</p><p>參數 ${fmt(m.parameters,0)} · FP32 權重 ${fmt(m.fp32_weights_mib,3)} MiB · Conv/Linear MAC ${fmt(m.macs_g,6)} G · ${m.blocks} blocks</p><p>PyTorch ${esc(m.calibration.torch)} / torchvision ${esc(m.calibration.torchvision)}；實際 CPU forward 已校驗，未載入預訓練權重，未評量準確率。<a href="${esc(m.calibration.source)}" target="_blank" rel="noopener">官方架構來源 ↗</a></p><p>停止原因：${esc(stopping[r.stopping_reason]||r.stopping_reason)} · ${r.episodes} episodes · seed ${r.seed}<br>搜尋空間 ${fmt(r.design_space_size,0)}；已評估 ${r.unique_evaluations}。${r.global_optimum_certified?"已完整枚舉此受限空間。":"結果為已評估設計中的最佳值，不保證全域最佳。"}<br>Q greedy policy 與最佳已評估 reward：${r.policy_rollout.matches_best_reward?"相符":"不同"}。固定 mesh 座標；RL 未搜尋任意拓撲或擺放。</p><p>權重、利用率、mapping 效率與記憶體為分析模型。Power 使用 Batch-1 能量／觀測時間；active time 依 assigned OPS 與 mapping efficiency 推估，非實測。75% utilization 僅用於 active compute。PHY 視為常駐；FPS 不參與功率或 reward。</p>`;
 }
 function svgNode(tag,attrs={},text){
   const e=document.createElementNS("http://www.w3.org/2000/svg",tag);Object.entries(attrs).forEach(([k,v])=>e.setAttribute(k,v));
@@ -207,7 +217,7 @@ async function init(){
     $("model-options").innerHTML=config.models.map(m=>`<label class="model-option"><input type="checkbox" name="model" value="${esc(m.name)}" ${m.name==="resnet50"?"checked":""}><span><strong>${esc(m.label)}</strong><small>${fmt(m.parameters/1e6,2)} M params · ${fmt(m.macs_g,3)} G MAC<br>${esc(m.description)}</small></span></label>`).join("");
     loadRequest({models:["resnet50"],preference:"balanced",limits:config.limits,strict:config.strict,budget:config.budget,seed:config.seed});
     const h=config.hardware;
-    $("hardware-values").innerHTML=Object.entries({"PE / chiplet":`${h.chiplet.pe_rows} × ${h.chiplet.pe_cols}`,"Frequency":`${fmt(h.chiplet.frequency_hz/1e6,0)} MHz`,"SRAM":`${h.chiplet.sram_mb} MiB`,"Utilization":`${h.chiplet.utilization*100}%`,"Chiplet upper bound":h.max_chiplets,"Link bandwidth":`${h.network.link_bandwidth_bits_per_cycle} bits/cycle/direction`,"Chiplet power":`${fmt(h.power.chiplet_static_w+h.power.chiplet_peak_dynamic_w*h.chiplet.utilization+h.power.phy_w,4)} W`}).map(([k,v])=>`<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("");
+    $("hardware-values").innerHTML=Object.entries({"PE / chiplet":`${h.chiplet.pe_rows} × ${h.chiplet.pe_cols}`,"Frequency":`${fmt(h.chiplet.frequency_hz/1e6,0)} MHz`,"SRAM":`${h.chiplet.sram_mb} MiB`,"Utilization":`${h.chiplet.utilization*100}%`,"Chiplet upper bound":h.max_chiplets,"Link bandwidth":`${h.network.link_bandwidth_bits_per_cycle} bits/cycle/direction`,"Chiplet fixed-utilization power":`${fmt(h.power.chiplet_static_w+h.power.chiplet_peak_dynamic_w*h.chiplet.utilization+h.power.phy_w,4)} W`}).map(([k,v])=>`<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("");
     $("connection").textContent="本機已連線";$("run").disabled=false;
     const previous=localStorage.getItem("chipletLabJob");
     if(previous){try{job=await api(`/api/jobs/${previous}`);loadRequest(job.request);updateJob();if(job.status==="running")schedulePoll();}catch{localStorage.removeItem("chipletLabJob");}}

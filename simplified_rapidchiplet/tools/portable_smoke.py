@@ -51,15 +51,20 @@ def main():
         for r in job['results']:
             c = r['best_candidate']
             assert c and c['backend']=='official' and r['best_breakdown']['admissible'], r
+            assert abs(c['power_avg_batch1_w']-c['total_power_w']) < 1e-12
+            assert abs(c['total_power_w']*c['power_observation_window_s']-c['energy_per_inference_j']) < 1e-12
             svg = request('/api/jobs/'+job['id']+'/placement.svg?model='+r['model']+'&event=all')
             doc = ElementTree.fromstring(svg)
             assert len(doc.findall('{http://www.w3.org/2000/svg}rect')) == c['selected_chiplets']
             report['models'].append(dict(model=r['model'],backend=c['backend'],chiplets=c['selected_chiplets'],
                                          latency_ms=c['avg_latency_ns']/1e6, power_w=c['total_power_w'],
                                          area_mm2=c['total_area_mm2'], unique_evaluations=r['unique_evaluations'],
+                                         energy_per_inference_j=c['energy_per_inference_j'],
+                                         power_fixed_utilization_w=c['power_fixed_utilization_w'],
                                          all_targets_met=r['best_breakdown']['feasible'], svg_verified=True))
         assert json.loads(request('/api/jobs/'+job['id']+'/results.json'))['status']=='completed'
-        assert b'latency_ms' in request('/api/jobs/'+job['id']+'/summary.csv')
+        csv = request('/api/jobs/'+job['id']+'/summary.csv')
+        assert b'latency_ms' in csv and b'energy_per_inference_j' in csv and b'power_fixed_utilization_w' in csv
         output = ROOT/'results/portable_smoke.json'
         output.parent.mkdir(exist_ok=True)
         output.write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')

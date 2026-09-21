@@ -99,7 +99,7 @@ E2E 仍為 `Σ compute + Σ serialization + Σ path`，未模擬 DRAM/cache stal
 
 RL 為每個模型／偏好重新訓練的 tabular Q-learning，不宣稱跨模型泛化。128 次 unique evaluation、3000 episodes 不是完整搜尋；停止原因與實際次數都輸出。嚴格模式「本次未找到」不等於證明無解。小空間多 seed 的窮舉對照驗證 Q policy 與 best archive；實際大模型結果仍需多 seed、相同預算 baseline 和 sensitivity 分析。
 
-正式 link bandwidth 為 **256 bits/cycle/direction**，200 MHz 下每方向 **51.2 Gbit/s（6.4 GB/s）**。單 chiplet 為 **0.8175 W**。
+正式 link bandwidth 為 **256 bits/cycle/direction**，200 MHz 下每方向 **51.2 Gbit/s（6.4 GB/s）**。舊 fixed-utilization 單 chiplet 為 **0.8175 W**，保留為 diagnostic；主功率改用 Batch-1 E/T。
 
 ## 驗證
 
@@ -107,6 +107,10 @@ RL 為每個模型／偏好重新訓練的 tabular Q-learning，不宣稱跨模�
 python -m unittest discover -s tests
 ```
 
-67 項測試通過，涵蓋逐項嚴格／軟限制、所有嚴格候選被拒絕時的 JSON/CSV、reward 連續性與單調性、Q policy 小空間多 seed 對照、depthwise 通訊、Fire mapping mask、模型 shape/MAC/parameter 一致性，以及實際 HTTP 搜尋與匯出。
+79 項測試通過，涵蓋逐項嚴格／軟限制、所有嚴格候選被拒絕時的 JSON/CSV、reward 連續性與單調性、Q policy 小空間多 seed 對照、depthwise 通訊、Fire mapping mask、模型 shape/MAC/parameter 一致性，以及實際 HTTP 搜尋與匯出。
 
 瀏覽器另實際驗證多模型搜尋、權重切換、取消、重新整理、chiplet 點選、事件 route overlay 與模型切換。最新正式頻寬驗證見 `VALIDATION_0917_zh-TW.md`。舊 `VALIDATION_0917_zh-TW.md`、`ASSUMPTIONS_AUDIT_20260920_zh-TW.md` 是 GUI 修改前的歷史基準；涉及模型、reward 與嚴格限制的部分以本文件為準。
+
+## PPA 定義與原版對照
+
+GUI Power 為 Batch-1 平均功率；Area 為配置外框。GUI 顯示 E_total、static／compute／link energy 與舊 fixed-utilization W，FPS 僅輸出。見 [能量模型說明](BATCH1_POWER_zh-TW.md)；完整公式、原版差異、忽略項與本次改動見 [PPA_AUDIT_zh-TW.md](PPA_AUDIT_zh-TW.md)。

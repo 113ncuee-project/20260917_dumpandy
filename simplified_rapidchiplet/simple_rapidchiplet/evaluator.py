@@ -8,6 +8,7 @@ from .dag_scheduler import schedule_block_dag
 from .e2e_latency import estimate_batch1_e2e_latency
 from .mapping import build_mapping_plan
 from .model import ModelSpec
+from .power import estimate_batch1_power
 from .rapidchiplet_engine import evaluate_with_rapidchiplet
 from .topology import Topology, make_topology
 from .workload import DpCostMode, WorkloadPartition, brute_force_pipeline_workloads, pareto_dp_pipeline_workloads
@@ -102,6 +103,21 @@ class EvaluationResult:
     effective_hardware: dict[str, object] = field(default_factory=dict)
     communication_events: tuple[dict[str, object], ...] = ()
     link_dynamic_energy_per_inference_j: float = 0.0
+    e2e_latency_cycles: float = 0.0
+    metric_definitions: dict[str, object] = field(default_factory=dict)
+    power_avg_batch1_w: float = 0.0
+    power_fixed_utilization_w: float = 0.0
+    chiplet_fixed_utilization_power_w: float = 0.0
+    energy_per_inference_j: float = 0.0
+    compute_dynamic_energy_j: float = 0.0
+    link_dynamic_energy_j: float = 0.0
+    static_energy_j: float = 0.0
+    static_power_w: float = 0.0
+    chiplet_static_power_w: float = 0.0
+    link_static_power_w: float = 0.0
+    power_observation_window_s: float = 0.0
+    chiplet_active_times_s: tuple[float, ...] = ()
+    chiplet_compute_dynamic_energies_j: tuple[float, ...] = ()
 
     def to_dict(self) -> dict[str, object]:
         return asdict(self)
@@ -209,7 +225,14 @@ def _evaluate_workload(
     network_fps = rapid_metrics.network_limited_fps
     pipeline_fps = e2e.pipeline_fps if schedule.feasible else 0.0
     achieved_fps = min(compute_fps, network_fps, pipeline_fps)
-    power_w = rapid_metrics.total_power_w
+    link_energy = _link_energy(topology, workload, cfg)
+    efficiencies = tuple(g.compute_efficiency for g in mapping_plan.groups for _ in range(g.chiplets))
+    energy = estimate_batch1_power(cfg, assigned_ops=workload.ops_per_chiplet,
+        compute_efficiencies=efficiencies, observation_window_s=e2e.estimated_e2e_latency_s,
+        link_static_power_w=rapid_metrics.total_link_power_w,
+        router_static_power_w=rapid_metrics.total_interposer_power_w,
+        link_dynamic_energy_j=link_energy)
+    power_w = energy.power_avg_batch1_w
     perf_per_w = achieved_fps / power_w if power_w > 0 else math.inf
 
     bottleneck = (
@@ -242,9 +265,9 @@ def _evaluate_workload(
         chip_width_mm=rapid_metrics.chip_width_mm,
         chip_height_mm=rapid_metrics.chip_height_mm,
         total_power_w=power_w,
-        total_chiplet_power_w=rapid_metrics.total_chiplet_power_w,
+        total_chiplet_power_w=energy.chiplet_average_power_w,
         total_interposer_power_w=rapid_metrics.total_interposer_power_w,
-        total_link_power_w=rapid_metrics.total_link_power_w,
+        total_link_power_w=energy.link_average_power_w,
         performance_per_w=perf_per_w,
         ppa_goal=ppa_goal,
         ppa_score=math.inf,
@@ -291,9 +314,37 @@ def _evaluate_workload(
         pipeline_initiation_interval_s=e2e.pipeline_initiation_interval_s,
         pipeline_fps=pipeline_fps,
         backend=rapid_metrics.backend,
-        effective_hardware=rapid_metrics.effective_hardware,
+        effective_hardware={**rapid_metrics.effective_hardware,
+            "power_model": "batch1_energy_over_observation_window_v1",
+            "diagnostic_power_model": rapid_metrics.effective_hardware.get("power_model"),
+            "dynamic_link_power_included": True, "fps_used_for_power": False},
         communication_events=workload.communication_events,
-        link_dynamic_energy_per_inference_j=_link_energy(topology, workload, cfg),
+        link_dynamic_energy_per_inference_j=link_energy,
+        power_avg_batch1_w=power_w,
+        power_fixed_utilization_w=rapid_metrics.total_power_w,
+        chiplet_fixed_utilization_power_w=rapid_metrics.total_chiplet_power_w,
+        energy_per_inference_j=energy.energy_per_inference_j,
+        compute_dynamic_energy_j=energy.compute_dynamic_energy_j,
+        link_dynamic_energy_j=energy.link_dynamic_energy_j,
+        static_energy_j=energy.static_energy_j, static_power_w=energy.static_power_w,
+        chiplet_static_power_w=energy.chiplet_static_power_w, link_static_power_w=energy.link_static_power_w,
+        power_observation_window_s=energy.observation_window_s,
+        chiplet_active_times_s=energy.chiplet_active_times_s,
+        chiplet_compute_dynamic_energies_j=energy.chiplet_compute_dynamic_energies_j,
+        e2e_latency_cycles=e2e.estimated_e2e_latency_s * cfg.chiplet.frequency_hz,
+        metric_definitions={
+            "power": "average_energy_over_estimated_batch1_window_not_measured_or_peak_power",
+            "power_fixed_utilization_w": "legacy_hardware_diagnostic_not_used_for_PPA",
+            "power_includes": ["chiplet_static", "compute_dynamic_during_estimated_active_time",
+                               "aggregate_static_phy_per_chiplet", "static_links_by_length", "dynamic_link_energy_over_batch1"],
+            "power_excludes": ["calibrated_memory_access_energy", "external_memory_power", "DVFS", "measured_activity"],
+            "performance_per_w": "legacy_pipeline_FPS_divided_by_batch1_average_W_not_inverse_energy",
+            "area": "placement_bounding_rectangle_including_gaps_not_silicon_sum",
+            "latency": "batch1_serial_sum_compute_and_tensor_event_service_not_measured",
+            "e2e_latency_cycles": "same_batch1_quantity_as_avg_latency_ns",
+            "legacy_min_avg_max_latency_cycles": "RapidChiplet_traffic_weighted_network_path_diagnostics",
+            "strict_constraints": "apply_to_these_estimates_not_a_physical_guarantee",
+        },
     )
 
 

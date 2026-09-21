@@ -723,6 +723,8 @@ def write_search_outputs(
                 "latency_ns": candidate.avg_latency_ns if candidate else None,
                 "area_mm2": candidate.total_area_mm2 if candidate else None,
                 "power_w": candidate.total_power_w if candidate else None,
+                "power_fixed_utilization_w": candidate.power_fixed_utilization_w if candidate else None,
+                "energy_per_inference_j": candidate.energy_per_inference_j if candidate else None,
                 "workload_plan": candidate.workload_plan if candidate else None,
             }
         )
@@ -737,7 +739,8 @@ def write_search_outputs(
         json.dumps(
             _json_safe(
                 {
-                    "version": "ppa-per-metric-hard-soft-dse-v4",
+                    "version": "ppa-batch1-energy-dse-v5",
+                    "power_model": "batch1_energy_over_observation_window_v1",
                     "results": len(values),
                     "method": "tabular_q_learning_terminal_preference_reward",
                     "semantic_block_extraction": True,

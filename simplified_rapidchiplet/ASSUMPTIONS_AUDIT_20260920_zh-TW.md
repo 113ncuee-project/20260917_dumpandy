@@ -29,7 +29,7 @@
 | A9 | OC broadcast=多份 unicast；IC=分片、leader reduction；固定 channel 區間 | 是一套選定的合法抽象協定，不是所有硬體唯一或最省 traffic 的方式 | 沒有 tree/ring reduction、硬體 multicast、廣泛跨消費者 cache reuse；需要比較協定或明列固定。 |
 | A10 | 預設固定 mesh、接近方形 row-major placement；group 使用連續 chiplet ID；最少 hop，平手最低 ID | RL 不搜尋 topology、placement、route 或 leader；未驗證 channel-dependency deadlock freedom／virtual channel 配置 | mapping 結果受指定佈局與路由侷限，不能稱完整 chiplet 系統最佳化。底層有 tree helper 不等於目前 RL 搜尋 tree。 |
 | A11 | 每顆固定正方形；4 個 PHY 都在幾何中心；link 長度用中心距離 | PHY 位置是簡化幾何，不是真實封裝佈線 | link latency、link power、package area 受此假設影響。 |
-| A12 | 每顆 power=0.15+0.85×0.75+0.03=0.8175 W；另加 link 長度×0.005 | 固定 utilization 功耗，沒有逐組活躍時間、idle/gating、memory／router activity、DVFS／溫度模型 | 同 N、同佈局的 OC/IC 有相同 A/P，策略差異主要只反映在 latency；不能宣稱已學到 workload-aware power 策略。 |
+| A12 | 主功率改為 Batch-1 E/T；舊 fixed-utilization W 保留 diagnostic | Active time 由 OPS／mapping efficiency 估計；PHY 視為 static；尚未校準 memory／DVFS／溫度 | 需同時觀察 energy 與 latency；平均 W 可因等待延長而降低，詳見 BATCH1_POWER_zh-TW.md。 |
 | A13 | link_dynamic_pj_per_bit=0.5 只用於每 inference bit-hop energy | 不加入目前 total_power_w 或 PPA power 約束；每 inference energy 不是瓦特 | 此值改動不會改變目前 power reward。若要平均動態 power，需定義活動率／工作排程；不代表必須要求使用者輸入 FPS。 |
 | A14 | area 使用 chiplet placement 外框的 interposer/package area；另有 total_chiplet_area | 沒有 PE、SRAM、PHY 的 macro area 模型、PDN、keep-out、thermal／manufacturing constraints | 不能把這個 A 直接當「所有運算電路面積」。 |
 | A15 | PE、SRAM、頻率、寬度、功耗係數可分別改 | 沒有把硬體容量與面積／功耗耦合 | **最需優先補強**：只增 PE 或 SRAM，固定 width/power 不變，會得到沒有同步付出 A/P 成本的收益。只升頻也不會自動增加功耗。 |

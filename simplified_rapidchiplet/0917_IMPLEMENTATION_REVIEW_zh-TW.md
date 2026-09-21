@@ -98,12 +98,12 @@ flowchart LR
 依附檔保留：8×8 PE、200 MHz、utilization 0.75、width 8.79772697916911 mm、spacing 0.15 mm、internal/PHY latency 3/12 cycles。SRAM 16 MiB 是 0917 原有平台假設，附檔沒有指定。
 
 ```text
-每顆 chiplet power = 0.15 + 0.85 × 0.75 + 0.03 = 0.8175 W
-總 power = 顆數 × 0.8175 + Σ(實體 link 長度 × 0.005 W/mm)
+舊 diagnostic 每顆 chiplet power = 0.15 + 0.85 × 0.75 + 0.03 = 0.8175 W
+舊 diagnostic 總 power = 顆數 × 0.8175 + Σ(實體 link 長度 × 0.005 W/mm)
 link latency = ceil(1 + 0.25 × link 長度) cycles
 ```
 
-0.03 W 是 0815 的每顆 aggregate PHY 項，不能又乘四。封裝為 passive；link 長度統一使用 chiplet 中心距離。`0.5 pJ/bit` 另輸出為每 inference 的 link dynamic energy，按 bit-hops 計算；依原固定 utilization power 定義，沒有借 FPS 把它改算成另一套 workload power。
+0.03 W 是 0815 的每顆 aggregate PHY 項，不能又乘四。封裝為 passive；link 長度統一使用 chiplet 中心距離。`0.5 pJ/bit` 另輸出為每 inference 的 link dynamic energy，按 bit-hops 計算；現在以 Batch-1 E/T 換算平均功率並加入主 PPA，不使用 FPS。詳見 [BATCH1_POWER_zh-TW.md](BATCH1_POWER_zh-TW.md)。
 
 正式預設頻寬為 **256 bits/cycle/direction = 51.2 Gbit/s**（200 MHz），由使用者確認。
 

@@ -18,9 +18,9 @@ def package_files():
         files.extend(p for p in (PROJECT/directory).glob(pattern) if p.is_file())
     files.extend(PROJECT/'scripts'/name for name in ('bootstrap_windows.ps1','run_gui.ps1'))
     files.extend(PROJECT/'tools'/name for name in ('portable_smoke.py','build_classmate_package.py',
-        'calibrate_models.py','calibrate_resnet50.py','record_gui_validation.py','validate_0917.py'))
+        'audit_ppa.py','calibrate_models.py','calibrate_resnet50.py','record_gui_validation.py','validate_0917.py'))
     files.extend(PROJECT/name for name in ('0917_IMPLEMENTATION_REVIEW_zh-TW.md',
-        'VALIDATION_0917_zh-TW.md','ASSUMPTIONS_AUDIT_20260920_zh-TW.md'))
+        'VALIDATION_0917_zh-TW.md','ASSUMPTIONS_AUDIT_20260920_zh-TW.md','PPA_AUDIT_zh-TW.md','BATCH1_POWER_zh-TW.md'))
     return sorted(set(files))
 
 

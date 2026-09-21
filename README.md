@@ -1,5 +1,7 @@
 # 0920 — Chiplet Lab
 
+[PPA 計算方式、原版 Rapid 對照及模型限制](simplified_rapidchiplet/PPA_AUDIT_zh-TW.md)
+
 Windows 一鍵啟動包：[下載 0920.zip](0920.zip?raw=true) · [使用說明](QUICK_START_zh-TW.md)。解壓縮後雙擊 `Start Chiplet Lab.cmd`；首次需連網，不必預裝 Python。
 
 # RapidChiplet 0917 修正版

@@ -1,6 +1,6 @@
 {
   "python": "3.13.15 (tags/v3.13.15:4061bc4, Aug  5 2026, 13:05:39) [MSC v.1944 64 bit (AMD64)]",
-  "job_id": "4097b6291f324c54af351b44af5335a4",
+  "job_id": "4adb8288032f4ed0a22a9f3e8d11872b",
   "bandwidth_bits_per_cycle": 256.0,
   "request": {
     "models": [
@@ -29,9 +29,11 @@
       "backend": "official",
       "chiplets": 9,
       "latency_ms": 205.7630526287493,
-      "power_w": 7.8943636187501465,
+      "power_w": 3.5531004545689573,
       "area_mm2": 712.5259085625046,
       "unique_evaluations": 128,
+      "energy_per_inference_j": 0.7310967958287055,
+      "power_fixed_utilization_w": 7.8943636187501465,
       "all_targets_met": true,
       "svg_verified": true
     },
@@ -40,9 +42,11 @@
       "backend": "official",
       "chiplets": 9,
       "latency_ms": 28.261592490636705,
-      "power_w": 7.8943636187501465,
+      "power_w": 6.960143307367188,
       "area_mm2": 712.5259085625046,
       "unique_evaluations": 113,
+      "energy_per_inference_j": 0.19670473382924386,
+      "power_fixed_utilization_w": 7.8943636187501465,
       "all_targets_met": true,
       "svg_verified": true
     },
@@ -51,9 +55,11 @@
       "backend": "official",
       "chiplets": 2,
       "latency_ms": 31.335738333333335,
-      "power_w": 1.6797386348958456,
+      "power_w": 1.0421391878214905,
       "area_mm2": 156.1196590468754,
       "unique_evaluations": 128,
+      "energy_per_inference_j": 0.03265620089648675,
+      "power_fixed_utilization_w": 1.6797386348958456,
       "all_targets_met": true,
       "svg_verified": true
     },
@@ -65,12 +71,15 @@
       "power_w": 0.8175,
       "area_mm2": 77.40000000000002,
       "unique_evaluations": 89,
+      "energy_per_inference_j": 0.02973246955,
+      "power_fixed_utilization_w": 0.8175,
       "all_targets_met": true,
       "svg_verified": true
     }
   ],
-  "source": "Actual four-model GUI HTTP API run with official RapidChiplet",
-  "unit_tests_passed": 67,
+  "source": "Actual four-model GUI HTTP API search using Batch-1 average energy power",
+  "unit_tests_passed": 79,
+  "power_model": "batch1_energy_over_observation_window_v1",
   "configuration": {
     "evaluation": {
       "max_chiplets": 16
@@ -138,15 +147,16 @@
     "simple_rapidchiplet/config.py": "362c6d44b0c57c107059d54856f25be010f0203c4acfe73d4803a06360fd3a6b",
     "simple_rapidchiplet/dag_scheduler.py": "19f2c30ba976e13f1d72053691f0aae74a01d22d0b8c36b821a3cb7f0d6c0430",
     "simple_rapidchiplet/e2e_latency.py": "8383c719da04edeae2c7a2dc87fbfed44d4f3a134113e8a0c5f4bf33ecac57d3",
-    "simple_rapidchiplet/evaluator.py": "cf95e881fa7e006b0c4ae6879e750a033d90ac6c4b27f7a75ae3508b69e6912d",
-    "simple_rapidchiplet/gui_server.py": "2449f42b6e9a32b10c0a7dc5ea0416d4c20a2c6de0e497c05c9f7aaf8eafb64b",
+    "simple_rapidchiplet/evaluator.py": "fdefc91b00daf6c33f68211e68623047afa65386baf73d12a10c73f548ae7e3b",
+    "simple_rapidchiplet/gui_server.py": "b4f3a7d963b0b20ef2a06b7305f1f87a67be860e9d247ec3a7af135fb6867070",
     "simple_rapidchiplet/mapping.py": "3f8e9b77468b4706b5a7405458edec64dd0e64c8c160a558d746ecf398af1f6f",
     "simple_rapidchiplet/model.py": "d3ba94ea6fb3cccceebf1df617375bdc4a8284aba9cbc3d2859af8d3d84220f9",
     "simple_rapidchiplet/placement_svg.py": "b0f3c8e5eca44c3f87c99a87855d7bb22c481608e85b811d11b5dfb14ffc43b0",
-    "simple_rapidchiplet/preference_dse.py": "c78c1dfae9d8612ec211a223ca9ff17bf350074cc715914a93a9505f789ed64a",
+    "simple_rapidchiplet/power.py": "23a680c14de12716ba9aa0aab118f843bc5c662a09643b0a46ed3f58ecbe9309",
+    "simple_rapidchiplet/preference_dse.py": "b8a50419c32e65555ca56517cee1c972f95ba8f4350fda1c530e0034a340395e",
     "simple_rapidchiplet/rapid_proxy.py": "b1b9339991191f97aa82fa35322affc6c02996a54ba17ffe180d3bbe1fd9db67",
     "simple_rapidchiplet/rapidchiplet_engine.py": "1fc849aae9c012994da8f3af14102bbffc9306e1ce0a654bfca1325a06a1ca0c",
-    "simple_rapidchiplet/report.py": "886be7a02100bc8495b95d0c92084494a437e122bee0cc36c8a76f8ee8d75472",
+    "simple_rapidchiplet/report.py": "12fe762781cb875d0839ae1f5a94fa19cb2b1c54d182465d6807f42bd323aa89",
     "simple_rapidchiplet/routing.py": "ffafa662368e194ad7c8937e5aa3e63a850ba99acb39bbc9d6f101d0d3602bd1",
     "simple_rapidchiplet/topology.py": "2b263ef68725d6a4133052fbfedab4a4daebdc3471639b137d5b46908d21964b",
     "simple_rapidchiplet/workload.py": "f4f3690309969c68b70b1b10e4397bd5a9fde7cb1bc95cd01d36475586cb4ee6"

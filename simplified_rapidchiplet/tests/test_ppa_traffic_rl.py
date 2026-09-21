@@ -293,8 +293,8 @@ class PpaTrafficRlTests(unittest.TestCase):
         local=evaluate_one(self.model,'mesh',2,self.cfg,workload=w)
         self.assertEqual(set(seen[0][1]['link_bandwidths'].values()),{256.})
         self.assertEqual(set(seen[1][1]['link_bandwidths'].values()),{512.})
-        self.assertAlmostEqual(a.total_chiplet_power_w,2*.8175)
-        self.assertAlmostEqual(b.total_power_w-a.total_power_w,.2)
+        self.assertAlmostEqual(a.chiplet_fixed_utilization_power_w,2*.8175)
+        self.assertAlmostEqual(b.power_fixed_utilization_w-a.power_fixed_utilization_w,.2)
         self.assertAlmostEqual(b.network_limited_fps,2*a.network_limited_fps)
         self.assertGreater(a.e2e_communication_serialization_ns, 0)
         self.assertAlmostEqual(b.e2e_communication_serialization_ns,
