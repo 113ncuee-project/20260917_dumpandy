@@ -1,0 +1,28 @@
+# 結果、實際路由與匯出
+
+最佳候選的實體 placement/links 如何補上 flow path，並產生 UI 摘要和檔案。
+
+![結果、實際路由與匯出 SVG 向量圖](04_results_and_routing.svg)
+
+[開啟 SVG 向量圖](04_results_and_routing.svg)
+
+[下載高解析 PNG（600 DPI）](04_results_and_routing.png) · [下載輕量 PNG（150 DPI）](04_results_and_routing_150dpi.png)
+
+```mermaid
+flowchart TB
+  SearchResult["q_learning_search 結果"] --> Attach["gui_server.attach_routes"]
+  Attach --> Graph["best_candidate.connection_graph<br/>節點座標、實體 links、traffic flows"]
+  Graph --> Router["routing.shortest_paths_for_pairs<br/>最短路徑；同長時低 ID 優先"]
+  Router --> Routed["每條 flow 加上 path"]
+  Routed --> Full["每模型完整 JSON"]
+  Routed --> View["result_view<br/>精簡 snapshot 與 learning curve"]
+  Routed --> Svg["placement_svg.render_placement_svg"]
+  Worker["gui_server 背景工作"] --> Disk["results/gui/{job-id}/<br/>每模型 JSON、results.json、summary.csv"]
+  Full --> Disk
+  Worker --> Disk
+  View --> Browser["GUI 結果頁"]
+  Disk --> API["HTTP 匯出 API"]
+  Svg --> API
+  API --> Browser
+  Cli["CLI 搜尋結果"] --> CliOutput["preference_dse.write_search_outputs<br/>CLI 結果目錄"]
+```

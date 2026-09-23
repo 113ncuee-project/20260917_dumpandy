@@ -1,0 +1,29 @@
+# 設計空間搜尋流程
+
+由使用者偏好建構合法動作，經 tabular Q-learning 評估並回饋候選 reward。
+
+![設計空間搜尋流程 SVG 向量圖](02_search_flow.svg)
+
+[開啟 SVG 向量圖](02_search_flow.svg)
+
+[下載高解析 PNG（600 DPI）](02_search_flow.png) · [下載輕量 PNG（150 DPI）](02_search_flow_150dpi.png)
+
+```mermaid
+flowchart TB
+  Request["GUI 請求<br/>模型、preference、PPA 上限、strict、budget、seed"] --> Validate["validate_request<br/>型別、範圍、可用模型"]
+  Validate --> Profile["make_preference_profile<br/>三項權重與嚴格／軟限制"]
+  Profile --> Blocks["extract_semantic_blocks<br/>建立模型語意 block DAG"]
+  Blocks --> State["DesignState<br/>下一個 block、已用 chiplet、群組與 mapping"]
+  State --> Mask["legal_actions + mapping_action_is_feasible<br/>列舉合法群組、chiplet 數與 mapping"]
+  Mask --> Policy["tabular Q-learning<br/>epsilon-greedy + 評估預算"]
+  Policy --> Complete{"block 是否全部分組？"}
+  Complete -- 否 --> State
+  Complete -- 是 --> Oracle["EvaluationOracle<br/>依 design_key 快取唯一設計"]
+  Oracle --> Workload["build_pipeline_workload<br/>group_specs、mapping、tensor events"]
+  Workload --> Eval["evaluate_one<br/>評估候選設計"]
+  Eval --> Score["score_result<br/>admissible、weighted cost、bonus、penalty、reward"]
+  Score --> Update["更新 Q 值、progress 與最佳合格候選"]
+  Update --> Budget{"budget 或 episodes 到上限？"}
+  Budget -- 否 --> Policy
+  Budget -- 是 --> Output["PreferenceSearchResult<br/>最佳候選、policy rollout、歷程與狀態"]
+```

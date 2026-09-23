@@ -1,0 +1,118 @@
+# Chiplet Lab 全域架構
+
+涵蓋平台啟動、GUI/API、搜尋、候選評估、RapidChiplet、路由與結果匯出。
+
+![Chiplet Lab 全域架構 SVG 向量圖](00_global_architecture.svg)
+
+[開啟 SVG 向量圖](00_global_architecture.svg)
+
+[下載高解析 PNG（600 DPI）](00_global_architecture.png) · [下載輕量 PNG（150 DPI）](00_global_architecture_150dpi.png)
+
+```mermaid
+flowchart TB
+  subgraph S0["平台啟動與執行環境"]
+    direction LR
+    WinCmd["Windows：Start Chiplet Lab.cmd"] --> WinBoot["bootstrap_windows.ps1<br/>隔離 Python runtime"]
+    MacCmd["macOS：Start Chiplet Lab.command"] --> MacBoot["bootstrap_macos.py<br/>Python 3.10+、系統 curl"]
+    Lock["packaging/runtime-lock.json<br/>固定版本與 SHA-256"] -.-> WinBoot
+    Lock -.-> MacBoot
+    WinBoot --> PyRuntime[".runtime/python-3.13.15-win64"]
+    WinBoot --> OfficialFiles[".runtime/rapidchiplet<br/>官方核心檔案"]
+    MacBoot --> OfficialFiles
+    WinBoot --> GuiEntry["gui.py"]
+    MacBoot --> GuiEntry
+    CliEntry["run.py"] --> CliMain["preference_dse.main()<br/>CLI 搜尋入口"]
+  end
+
+  subgraph S1["GUI、HTTP API 與設定"]
+    direction LR
+    GuiEntry --> Application["gui_server.Application<br/>載入設定、模型與工作狀態"]
+    Defaults["configs/defaults.json<br/>硬體、網路、power、PPA、搜尋參數"] --> Application
+    ModelsFile["configs/models.json<br/>模型 blocks 與校驗 metadata"] --> Application
+    Application --> Http["ThreadingHTTPServer<br/>只綁定 127.0.0.1"]
+    Http --> Api["本機 API<br/>config / jobs / cancel / exports"]
+    Api --> Application
+    Application --> Worker["背景搜尋工作<br/>同時一個 active job"]
+
+    Browser["使用者的預設瀏覽器"] --> Html["gui/index.html<br/>介面結構"]
+    Html --> Js["gui/app.js<br/>表單、輪詢、結果繪圖、下載"]
+    Html --> Css["gui/style.css<br/>版面與樣式"]
+    Browser -->|"HTTP：localhost API；POST 帶 session token"| Api
+    Api -->|"JSON 狀態與結果"| Browser
+  end
+
+  subgraph S2["設計空間搜尋：每個所選模型依序處理"]
+    direction LR
+    Worker --> QSearch["preference_dse.q_learning_search"]
+    CliMain --> QSearch
+    Application -->|"ModelSpec + EvalConfig + 使用者限制"| QSearch
+    QSearch --> Extract["extract_semantic_blocks<br/>語意 block DAG"]
+    Extract --> State["DesignState<br/>連續 block 群組、chiplet 數、mapping"]
+    State --> Actions["legal_actions<br/>SRAM／operator／channel／數量限制"]
+    Actions --> Policy["tabular Q-learning<br/>epsilon-greedy；budget／seed"]
+    Policy --> Complete{"分組完成？"}
+    Complete -->|"否：繼續選動作"| State
+    Complete -->|"是：評估終端設計"| Oracle["EvaluationOracle<br/>design_key 快取重複候選"]
+    Oracle --> Workload["build_pipeline_workload<br/>group_specs、mapping、tensor events"]
+    Workload --> CandidateEval["evaluator.evaluate_one"]
+    CandidateEval --> Score["score_result<br/>嚴格資格、PPA 權重、reward"]
+    Score --> Update["更新 Q 值與最佳合格候選"]
+    Update --> Stop{"budget／episodes 到上限？"}
+    Stop -->|"否"| Policy
+    Stop -->|"是"| SearchResult["PreferenceSearchResult<br/>候選、學習歷程、policy rollout"]
+  end
+
+  subgraph S3["單一候選評估：共用工作量、實體拓撲與估算模型"]
+    direction LR
+    ModelsFile --> ModelSpec["ModelSpec<br/>語意 blocks 與 DAG 依賴"]
+    Workload --> Events["communication.py<br/>tensor ownership、unicast、IC partial sum／歸約"]
+    ModelSpec --> Workload
+    Workload --> Mapping["mapping.py<br/>single／OC／IC、SRAM 與效率"]
+    Defaults --> Mapping
+    CandidateEval --> Topology["topology.py<br/>固定 row-major mesh 與實體 links"]
+    Defaults --> Topology
+    Events --> Schedule["dag_scheduler.py<br/>依賴與 chiplet 資源排程"]
+    Mapping --> Schedule
+    Topology --> Schedule
+    Events --> E2E["e2e_latency.py<br/>Batch-1 compute + serialization + path"]
+    Mapping --> E2E
+    Topology --> E2E
+    Defaults --> E2E
+
+    Events --> RCEngine["rapidchiplet_engine.py<br/>官方核心 adapter"]
+    Topology --> RCEngine
+    Defaults --> RCEngine
+    OfficialFiles -->|"預設 backend=official；動態載入"| RCEngine
+    RCEngine -->|"area、network latency、throughput、links"| CandidateEval
+    RCEngine -.->|"僅 backend=local 或 auto 可用"| Proxy["rapid_proxy.py<br/>本地估算代理"]
+
+    Mapping --> CandidateEval
+    Schedule --> CandidateEval
+    E2E --> CandidateEval
+    CandidateEval --> Power["power.py<br/>Batch-1 energy ÷ E2E 觀測時間"]
+    E2E --> Power
+    Defaults --> Power
+    Power --> EvalResult["EvaluationResult<br/>PPA estimates、架構可行性、mapping、schedule、graph"]
+    CandidateEval --> EvalResult
+    EvalResult --> Score
+  end
+
+  subgraph S4["完成結果、實際路由與匯出"]
+    direction LR
+    CliMain --> CliFiles["write_search_outputs<br/>CLI 結果目錄"]
+    SearchResult --> Attach["gui_server.attach_routes"]
+    Attach --> ActualGraph["best_candidate.connection_graph<br/>實際座標、physical links、traffic flows"]
+    ActualGraph --> Router["routing.shortest_paths_for_pairs<br/>依實際 links 算最短路徑"]
+    Router --> Routed["附上每條 flow 的 path"]
+    Routed --> View["result_view<br/>GUI 用摘要與 learning curve"]
+    Routed --> FullJson["每模型完整 JSON"]
+    Routed --> Svg["placement_svg.render_placement_svg<br/>依目前 event 產生 SVG"]
+    Worker --> Disk["simplified_rapidchiplet/results/gui/{job-id}/<br/>每模型 JSON、results.json、summary.csv"]
+    FullJson --> Disk
+    Worker --> Disk
+    View --> Api
+    Disk --> Api
+    Svg --> Api
+    Api -->|"job snapshot／JSON／CSV／SVG"| Browser
+  end
+```

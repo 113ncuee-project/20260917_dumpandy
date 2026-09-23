@@ -2,6 +2,8 @@
 
 macOS 使用者：[快速開始](QUICK_START_macOS_zh-TW.md)。支援 Apple silicon 與 Intel Mac；需安裝 Python 3.10 或更新版本，然後雙擊根目錄的 `Start Chiplet Lab.command`。
 
+系統與資料流：[全域架構與局部詳細圖](ARCHITECTURE_zh-TW.md) · [下載全部 SVG、600/150 DPI PNG 與原始碼](architecture_diagrams_zh-TW.zip)。
+
 [PPA 計算方式、原版 Rapid 對照及模型限制](simplified_rapidchiplet/PPA_AUDIT_zh-TW.md)
 
 Windows 一鍵啟動包：[下載 0920.zip](0920.zip?raw=true) · [使用說明](QUICK_START_zh-TW.md)。解壓縮後雙擊 `Start Chiplet Lab.cmd`；首次需連網，不必預裝 Python。

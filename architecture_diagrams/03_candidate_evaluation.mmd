@@ -1,0 +1,32 @@
+flowchart TB
+  Candidate["完整 DesignState<br/>block groups + chiplet 數 + mapping"] --> Work["workload.py<br/>工作分配與 tensor 通訊事件"]
+  Model["configs/models.json<br/>ModelSpec 與 block DAG"] --> Work
+  Work --> Events["communication.py<br/>ownership、unicast、IC partial sum 與歸約"]
+  Work --> Mapping["mapping.py<br/>mapping plan、SRAM、channel 與效率"]
+  Cfg["configs/defaults.json<br/>PE、頻率、SRAM、link、power 與限制"] --> Mapping
+  Cfg --> Topo["topology.py<br/>固定 row-major mesh、座標與實體 links"]
+  Candidate --> Topo
+  Events --> Schedule["dag_scheduler.py<br/>依賴與 chiplet 資源排程、架構可行性"]
+  Mapping --> Schedule
+  Topo --> Schedule
+  Events --> E2E["e2e_latency.py<br/>compute + serialization + path latency"]
+  Mapping --> E2E
+  Topo --> E2E
+  Cfg --> E2E
+  Topo --> RC["rapidchiplet_engine.py<br/>官方輸入與 link routing"]
+  Events --> RC
+  Cfg --> RC
+  Runtime[".runtime/rapidchiplet<br/>官方 RapidChiplet 核心"] --> RC
+  RC --> NetMetrics["network／throughput／area／power metrics"]
+  RC -.->|"僅 backend=local 或 auto 的代理路徑"| Proxy["rapid_proxy.py"]
+  Mapping --> Eval["evaluator._evaluate_workload<br/>協調單一候選評估"]
+  Schedule --> Eval
+  E2E --> Eval
+  NetMetrics --> Eval
+  Eval --> Power["power.py<br/>Batch-1 能量 ÷ E2E 觀測時間"]
+  E2E --> Power
+  Cfg --> Power
+  Power --> Result["EvaluationResult<br/>PPA、schedule、graph 與 mapping"]
+  Eval --> Result
+  Result --> Reward["preference_dse.score_result<br/>strict eligibility 與 reward"]
+  Profile["PreferenceProfile<br/>偏好權重、PPA 上限與 strict 設定"] --> Reward

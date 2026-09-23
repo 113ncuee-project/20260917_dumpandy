@@ -1,0 +1,189 @@
+<svg width="825pt" height="863pt"
+ viewBox="0.00 0.00 825.00 863.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(25.2 837.92)">
+<title>G</title>
+<polygon fill="white" stroke="none" points="-25.2,25.2 -25.2,-837.92 799.5,-837.92 799.5,25.2 -25.2,25.2"/>
+<text xml:space="preserve" text-anchor="middle" x="387.15" y="-788.02" font-family="Arial" font-size="23.00">結果、實際路由與匯出</text>
+<!-- n_SearchResult -->
+<g id="node1" class="node">
+<title>n_SearchResult</title>
+<path fill="#f8fbff" stroke="#63809a" stroke-width="1.15" d="M448.73,-777.12C448.73,-777.12 301.51,-777.12 301.51,-777.12 295.51,-777.12 289.51,-771.12 289.51,-765.12 289.51,-765.12 289.51,-753.12 289.51,-753.12 289.51,-747.12 295.51,-741.12 301.51,-741.12 301.51,-741.12 448.73,-741.12 448.73,-741.12 454.73,-741.12 460.73,-747.12 460.73,-753.12 460.73,-753.12 460.73,-765.12 460.73,-765.12 460.73,-771.12 454.73,-777.12 448.73,-777.12"/>
+<text xml:space="preserve" text-anchor="middle" x="375.12" y="-754.92" font-family="Arial" font-size="14.00" fill="#17324d">q_learning_search 結果</text>
+</g>
+<!-- n_Attach -->
+<g id="node2" class="node">
+<title>n_Attach</title>
+<path fill="#f8fbff" stroke="#63809a" stroke-width="1.15" d="M454.56,-688.68C454.56,-688.68 295.67,-688.68 295.67,-688.68 289.67,-688.68 283.67,-682.68 283.67,-676.68 283.67,-676.68 283.67,-664.68 283.67,-664.68 283.67,-658.68 289.67,-652.68 295.67,-652.68 295.67,-652.68 454.56,-652.68 454.56,-652.68 460.56,-652.68 466.56,-658.68 466.56,-664.68 466.56,-664.68 466.56,-676.68 466.56,-676.68 466.56,-682.68 460.56,-688.68 454.56,-688.68"/>
+<text xml:space="preserve" text-anchor="middle" x="375.12" y="-666.48" font-family="Arial" font-size="14.00" fill="#17324d">gui_server.attach_routes</text>
+</g>
+<!-- n_SearchResult&#45;&gt;n_Attach -->
+<g id="edge1" class="edge">
+<title>n_SearchResult&#45;&gt;n_Attach</title>
+<path fill="none" stroke="#69859c" stroke-width="1.05" d="M375.12,-740.63C375.12,-728.33 375.12,-711.65 375.12,-697.78"/>
+<polygon fill="#69859c" stroke="#69859c" stroke-width="1.05" points="377.64,-697.94 375.12,-690.74 372.6,-697.94 377.64,-697.94"/>
+</g>
+<!-- n_Graph -->
+<g id="node3" class="node">
+<title>n_Graph</title>
+<path fill="#f8fbff" stroke="#63809a" stroke-width="1.15" d="M482.6,-600.24C482.6,-600.24 267.63,-600.24 267.63,-600.24 261.63,-600.24 255.63,-594.24 255.63,-588.24 255.63,-588.24 255.63,-544.56 255.63,-544.56 255.63,-538.56 261.63,-532.56 267.63,-532.56 267.63,-532.56 482.6,-532.56 482.6,-532.56 488.6,-532.56 494.6,-538.56 494.6,-544.56 494.6,-544.56 494.6,-588.24 494.6,-588.24 494.6,-594.24 488.6,-600.24 482.6,-600.24"/>
+<text xml:space="preserve" text-anchor="middle" x="375.12" y="-579" font-family="Arial" font-size="14.00" fill="#17324d">best_candidate.connection_graph</text>
+<text xml:space="preserve" text-anchor="middle" x="375.12" y="-562.2" font-family="Arial" font-size="14.00" fill="#17324d">節點座標、實體 links、traffic</text>
+<text xml:space="preserve" text-anchor="middle" x="375.12" y="-545.4" font-family="Arial" font-size="14.00" fill="#17324d">flows</text>
+</g>
+<!-- n_Attach&#45;&gt;n_Graph -->
+<g id="edge2" class="edge">
+<title>n_Attach&#45;&gt;n_Graph</title>
+<path fill="none" stroke="#69859c" stroke-width="1.05" d="M375.12,-652.33C375.12,-640.51 375.12,-624.34 375.12,-609.28"/>
+<polygon fill="#69859c" stroke="#69859c" stroke-width="1.05" points="377.64,-609.37 375.12,-602.17 372.6,-609.37 377.64,-609.37"/>
+</g>
+<!-- n_Router -->
+<g id="node4" class="node">
+<title>n_Router</title>
+<path fill="#f8fbff" stroke="#63809a" stroke-width="1.15" d="M477.91,-487.56C477.91,-487.56 272.32,-487.56 272.32,-487.56 266.32,-487.56 260.32,-481.56 260.32,-475.56 260.32,-475.56 260.32,-448.68 260.32,-448.68 260.32,-442.68 266.32,-436.68 272.32,-436.68 272.32,-436.68 477.91,-436.68 477.91,-436.68 483.91,-436.68 489.91,-442.68 489.91,-448.68 489.91,-448.68 489.91,-475.56 489.91,-475.56 489.91,-481.56 483.91,-487.56 477.91,-487.56"/>
+<text xml:space="preserve" text-anchor="middle" x="375.12" y="-466.32" font-family="Arial" font-size="14.00" fill="#17324d">routing.shortest_paths_for_pairs</text>
+<text xml:space="preserve" text-anchor="middle" x="375.12" y="-449.52" font-family="Arial" font-size="14.00" fill="#17324d">最短路徑；同長時低 ID 優先</text>
+</g>
+<!-- n_Graph&#45;&gt;n_Router -->
+<g id="edge3" class="edge">
+<title>n_Graph&#45;&gt;n_Router</title>
+<path fill="none" stroke="#69859c" stroke-width="1.05" d="M375.12,-532.19C375.12,-520.87 375.12,-508.2 375.12,-496.84"/>
+<polygon fill="#69859c" stroke="#69859c" stroke-width="1.05" points="377.64,-496.85 375.12,-489.65 372.6,-496.85 377.64,-496.85"/>
+</g>
+<!-- n_Routed -->
+<g id="node5" class="node">
+<title>n_Routed</title>
+<path fill="#f8fbff" stroke="#63809a" stroke-width="1.15" d="M432.76,-391.68C432.76,-391.68 317.47,-391.68 317.47,-391.68 311.47,-391.68 305.47,-385.68 305.47,-379.68 305.47,-379.68 305.47,-367.68 305.47,-367.68 305.47,-361.68 311.47,-355.68 317.47,-355.68 317.47,-355.68 432.76,-355.68 432.76,-355.68 438.76,-355.68 444.76,-361.68 444.76,-367.68 444.76,-367.68 444.76,-379.68 444.76,-379.68 444.76,-385.68 438.76,-391.68 432.76,-391.68"/>
+<text xml:space="preserve" text-anchor="middle" x="375.12" y="-369.48" font-family="Arial" font-size="14.00" fill="#17324d">每條 flow 加上 path</text>
+</g>
+<!-- n_Router&#45;&gt;n_Routed -->
+<g id="edge4" class="edge">
+<title>n_Router&#45;&gt;n_Routed</title>
+<path fill="none" stroke="#69859c" stroke-width="1.05" d="M375.12,-436.12C375.12,-425.02 375.12,-411.97 375.12,-400.75"/>
+<polygon fill="#69859c" stroke="#69859c" stroke-width="1.05" points="377.64,-401.01 375.12,-393.81 372.6,-401.01 377.64,-401.01"/>
+</g>
+<!-- n_Full -->
+<g id="node6" class="node">
+<title>n_Full</title>
+<path fill="#f8fbff" stroke="#63809a" stroke-width="1.15" d="M762.3,-310.68C762.3,-310.68 657.93,-310.68 657.93,-310.68 651.93,-310.68 645.93,-304.68 645.93,-298.68 645.93,-298.68 645.93,-286.68 645.93,-286.68 645.93,-280.68 651.93,-274.68 657.93,-274.68 657.93,-274.68 762.3,-274.68 762.3,-274.68 768.3,-274.68 774.3,-280.68 774.3,-286.68 774.3,-286.68 774.3,-298.68 774.3,-298.68 774.3,-304.68 768.3,-310.68 762.3,-310.68"/>
+<text xml:space="preserve" text-anchor="middle" x="710.12" y="-288.48" font-family="Arial" font-size="14.00" fill="#17324d">每模型完整 JSON</text>
+</g>
+<!-- n_Routed&#45;&gt;n_Full -->
+<g id="edge5" class="edge">
+<title>n_Routed&#45;&gt;n_Full</title>
+<path fill="none" stroke="#69859c" stroke-width="1.05" d="M444.94,-356.22C501.23,-342.94 580.15,-324.33 637.24,-310.87"/>
+<polygon fill="#69859c" stroke="#69859c" stroke-width="1.05" points="637.52,-313.39 643.95,-309.28 636.36,-308.48 637.52,-313.39"/>
+</g>
+<!-- n_View -->
+<g id="node7" class="node">
+<title>n_View</title>
+<path fill="#f8fbff" stroke="#63809a" stroke-width="1.15" d="M208.23,-221.28C208.23,-221.28 12,-221.28 12,-221.28 6,-221.28 0,-215.28 0,-209.28 0,-209.28 0,-182.4 0,-182.4 0,-176.4 6,-170.4 12,-170.4 12,-170.4 208.23,-170.4 208.23,-170.4 214.23,-170.4 220.23,-176.4 220.23,-182.4 220.23,-182.4 220.23,-209.28 220.23,-209.28 220.23,-215.28 214.23,-221.28 208.23,-221.28"/>
+<text xml:space="preserve" text-anchor="middle" x="110.12" y="-200.04" font-family="Arial" font-size="14.00" fill="#17324d">result_view</text>
+<text xml:space="preserve" text-anchor="middle" x="110.12" y="-183.24" font-family="Arial" font-size="14.00" fill="#17324d">精簡 snapshot 與 learning curve</text>
+</g>
+<!-- n_Routed&#45;&gt;n_View -->
+<g id="edge6" class="edge">
+<title>n_Routed&#45;&gt;n_View</title>
+<path fill="none" stroke="#69859c" stroke-width="1.05" d="M348.74,-355.18C303.51,-325.16 210.67,-263.56 155.06,-226.66"/>
+<polygon fill="#69859c" stroke="#69859c" stroke-width="1.05" points="156.52,-224.61 149.13,-222.73 153.74,-228.81 156.52,-224.61"/>
+</g>
+<!-- n_Svg -->
+<g id="node8" class="node">
+<title>n_Svg</title>
+<path fill="#f8fbff" stroke="#63809a" stroke-width="1.15" d="M497.75,-213.84C497.75,-213.84 252.48,-213.84 252.48,-213.84 246.48,-213.84 240.48,-207.84 240.48,-201.84 240.48,-201.84 240.48,-189.84 240.48,-189.84 240.48,-183.84 246.48,-177.84 252.48,-177.84 252.48,-177.84 497.75,-177.84 497.75,-177.84 503.75,-177.84 509.75,-183.84 509.75,-189.84 509.75,-189.84 509.75,-201.84 509.75,-201.84 509.75,-207.84 503.75,-213.84 497.75,-213.84"/>
+<text xml:space="preserve" text-anchor="middle" x="375.12" y="-191.64" font-family="Arial" font-size="14.00" fill="#17324d">placement_svg.render_placement_svg</text>
+</g>
+<!-- n_Routed&#45;&gt;n_Svg -->
+<g id="edge7" class="edge">
+<title>n_Routed&#45;&gt;n_Svg</title>
+<path fill="none" stroke="#69859c" stroke-width="1.05" d="M375.12,-355.18C375.12,-324.11 375.12,-259.17 375.12,-222.85"/>
+<polygon fill="#69859c" stroke="#69859c" stroke-width="1.05" points="377.64,-223.06 375.12,-215.86 372.6,-223.06 377.64,-223.06"/>
+</g>
+<!-- n_Disk -->
+<g id="node10" class="node">
+<title>n_Disk</title>
+<path fill="#f8fbff" stroke="#63809a" stroke-width="1.15" d="M716.71,-229.68C716.71,-229.68 541.53,-229.68 541.53,-229.68 535.53,-229.68 529.53,-223.68 529.53,-217.68 529.53,-217.68 529.53,-174 529.53,-174 529.53,-168 535.53,-162 541.53,-162 541.53,-162 716.71,-162 716.71,-162 722.71,-162 728.71,-168 728.71,-174 728.71,-174 728.71,-217.68 728.71,-217.68 728.71,-223.68 722.71,-229.68 716.71,-229.68"/>
+<text xml:space="preserve" text-anchor="middle" x="629.12" y="-208.44" font-family="Arial" font-size="14.00" fill="#17324d">results/gui/{job&#45;id}/</text>
+<text xml:space="preserve" text-anchor="middle" x="629.12" y="-191.64" font-family="Arial" font-size="14.00" fill="#17324d">每模型 JSON、results.json、</text>
+<text xml:space="preserve" text-anchor="middle" x="629.12" y="-174.84" font-family="Arial" font-size="14.00" fill="#17324d">summary.csv</text>
+</g>
+<!-- n_Full&#45;&gt;n_Disk -->
+<g id="edge9" class="edge">
+<title>n_Full&#45;&gt;n_Disk</title>
+<path fill="none" stroke="#69859c" stroke-width="1.05" d="M695.26,-274.28C686.23,-263.72 674.32,-249.76 663.09,-236.62"/>
+<polygon fill="#69859c" stroke="#69859c" stroke-width="1.05" points="665.27,-235.29 658.68,-231.46 661.44,-238.57 665.27,-235.29"/>
+</g>
+<!-- n_Browser -->
+<g id="node11" class="node">
+<title>n_Browser</title>
+<path fill="#f8fbff" stroke="#63809a" stroke-width="1.15" d="M276.41,-36C276.41,-36 207.82,-36 207.82,-36 201.82,-36 195.82,-30 195.82,-24 195.82,-24 195.82,-12 195.82,-12 195.82,-6 201.82,0 207.82,0 207.82,0 276.41,0 276.41,0 282.41,0 288.41,-6 288.41,-12 288.41,-12 288.41,-24 288.41,-24 288.41,-30 282.41,-36 276.41,-36"/>
+<text xml:space="preserve" text-anchor="middle" x="242.12" y="-13.8" font-family="Arial" font-size="14.00" fill="#17324d">GUI 結果頁</text>
+</g>
+<!-- n_View&#45;&gt;n_Browser -->
+<g id="edge11" class="edge">
+<title>n_View&#45;&gt;n_Browser</title>
+<path fill="none" stroke="#69859c" stroke-width="1.05" d="M128.75,-170.02C154.09,-136.26 199.13,-76.26 224.14,-42.95"/>
+<polygon fill="#69859c" stroke="#69859c" stroke-width="1.05" points="225.89,-44.81 228.2,-37.54 221.86,-41.79 225.89,-44.81"/>
+</g>
+<!-- n_API -->
+<g id="node12" class="node">
+<title>n_API</title>
+<path fill="#f8fbff" stroke="#63809a" stroke-width="1.15" d="M422.63,-117C422.63,-117 327.6,-117 327.6,-117 321.6,-117 315.6,-111 315.6,-105 315.6,-105 315.6,-93 315.6,-93 315.6,-87 321.6,-81 327.6,-81 327.6,-81 422.63,-81 422.63,-81 428.63,-81 434.63,-87 434.63,-93 434.63,-93 434.63,-105 434.63,-105 434.63,-111 428.63,-117 422.63,-117"/>
+<text xml:space="preserve" text-anchor="middle" x="375.12" y="-94.8" font-family="Arial" font-size="14.00" fill="#17324d">HTTP 匯出 API</text>
+</g>
+<!-- n_Svg&#45;&gt;n_API -->
+<g id="edge13" class="edge">
+<title>n_Svg&#45;&gt;n_API</title>
+<path fill="none" stroke="#69859c" stroke-width="1.05" d="M375.12,-177.44C375.12,-163.01 375.12,-142.26 375.12,-125.87"/>
+<polygon fill="#69859c" stroke="#69859c" stroke-width="1.05" points="377.64,-126.07 375.12,-118.87 372.6,-126.07 377.64,-126.07"/>
+</g>
+<!-- n_Worker -->
+<g id="node9" class="node">
+<title>n_Worker</title>
+<path fill="#f8fbff" stroke="#63809a" stroke-width="1.15" d="M613.48,-310.68C613.48,-310.68 492.75,-310.68 492.75,-310.68 486.75,-310.68 480.75,-304.68 480.75,-298.68 480.75,-298.68 480.75,-286.68 480.75,-286.68 480.75,-280.68 486.75,-274.68 492.75,-274.68 492.75,-274.68 613.48,-274.68 613.48,-274.68 619.48,-274.68 625.48,-280.68 625.48,-286.68 625.48,-286.68 625.48,-298.68 625.48,-298.68 625.48,-304.68 619.48,-310.68 613.48,-310.68"/>
+<text xml:space="preserve" text-anchor="middle" x="553.12" y="-288.48" font-family="Arial" font-size="14.00" fill="#17324d">gui_server 背景工作</text>
+</g>
+<!-- n_Worker&#45;&gt;n_Disk -->
+<g id="edge8" class="edge">
+<title>n_Worker&#45;&gt;n_Disk</title>
+<path fill="none" stroke="#69859c" stroke-width="1.05" d="M561.1,-274.28C568.23,-263.81 578.8,-250.02 589.53,-236.98"/>
+<polygon fill="#69859c" stroke="#69859c" stroke-width="1.05" points="591.45,-238.61 594.13,-231.47 587.58,-235.38 591.45,-238.61"/>
+</g>
+<!-- n_Worker&#45;&gt;n_Disk -->
+<g id="edge10" class="edge">
+<title>n_Worker&#45;&gt;n_Disk</title>
+<path fill="none" stroke="#69859c" stroke-width="1.05" d="M573.02,-274.28C582.67,-263.81 594.21,-250.02 604.37,-236.98"/>
+<polygon fill="#69859c" stroke="#69859c" stroke-width="1.05" points="606.19,-238.75 608.58,-231.51 602.19,-235.68 606.19,-238.75"/>
+</g>
+<!-- n_Disk&#45;&gt;n_API -->
+<g id="edge12" class="edge">
+<title>n_Disk&#45;&gt;n_API</title>
+<path fill="none" stroke="#69859c" stroke-width="1.05" d="M539.92,-161.54C503.29,-147.86 462.04,-132.45 429.97,-120.48"/>
+<polygon fill="#69859c" stroke="#69859c" stroke-width="1.05" points="431.14,-118.23 423.51,-118.07 429.37,-122.95 431.14,-118.23"/>
+</g>
+<!-- n_API&#45;&gt;n_Browser -->
+<g id="edge14" class="edge">
+<title>n_API&#45;&gt;n_Browser</title>
+<path fill="none" stroke="#69859c" stroke-width="1.05" d="M345.6,-80.47C325.97,-68.81 300.04,-53.4 279.04,-40.93"/>
+<polygon fill="#69859c" stroke="#69859c" stroke-width="1.05" points="280.39,-38.81 272.92,-37.3 277.82,-43.14 280.39,-38.81"/>
+</g>
+<!-- n_Cli -->
+<g id="node13" class="node">
+<title>n_Cli</title>
+<path fill="#f8fbff" stroke="#63809a" stroke-width="1.15" d="M656.69,-777.12C656.69,-777.12 579.54,-777.12 579.54,-777.12 573.54,-777.12 567.54,-771.12 567.54,-765.12 567.54,-765.12 567.54,-753.12 567.54,-753.12 567.54,-747.12 573.54,-741.12 579.54,-741.12 579.54,-741.12 656.69,-741.12 656.69,-741.12 662.69,-741.12 668.69,-747.12 668.69,-753.12 668.69,-753.12 668.69,-765.12 668.69,-765.12 668.69,-771.12 662.69,-777.12 656.69,-777.12"/>
+<text xml:space="preserve" text-anchor="middle" x="618.12" y="-754.92" font-family="Arial" font-size="14.00" fill="#17324d">CLI 搜尋結果</text>
+</g>
+<!-- n_CliOutput -->
+<g id="node14" class="node">
+<title>n_CliOutput</title>
+<path fill="#f8fbff" stroke="#63809a" stroke-width="1.15" d="M737.64,-696.12C737.64,-696.12 498.59,-696.12 498.59,-696.12 492.59,-696.12 486.59,-690.12 486.59,-684.12 486.59,-684.12 486.59,-657.24 486.59,-657.24 486.59,-651.24 492.59,-645.24 498.59,-645.24 498.59,-645.24 737.64,-645.24 737.64,-645.24 743.64,-645.24 749.64,-651.24 749.64,-657.24 749.64,-657.24 749.64,-684.12 749.64,-684.12 749.64,-690.12 743.64,-696.12 737.64,-696.12"/>
+<text xml:space="preserve" text-anchor="middle" x="618.12" y="-674.88" font-family="Arial" font-size="14.00" fill="#17324d">preference_dse.write_search_outputs</text>
+<text xml:space="preserve" text-anchor="middle" x="618.12" y="-658.08" font-family="Arial" font-size="14.00" fill="#17324d">CLI 結果目錄</text>
+</g>
+<!-- n_Cli&#45;&gt;n_CliOutput -->
+<g id="edge15" class="edge">
+<title>n_Cli&#45;&gt;n_CliOutput</title>
+<path fill="none" stroke="#69859c" stroke-width="1.05" d="M618.12,-740.63C618.12,-730.47 618.12,-717.32 618.12,-705.24"/>
+<polygon fill="#69859c" stroke="#69859c" stroke-width="1.05" points="620.64,-705.47 618.12,-698.27 615.6,-705.47 620.64,-705.47"/>
+</g>
+</g>
+</svg>
