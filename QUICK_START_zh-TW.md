@@ -1,5 +1,7 @@
 # 0920：給同學的啟動說明
 
+macOS 使用者請改看 [macOS 快速開始](QUICK_START_macOS_zh-TW.md)；本頁的一鍵 ZIP 僅支援 Windows。
+
 適用 **Windows 10／11，Intel／AMD 64 位元電腦**。
 
 1. 下載 repository 根目錄的 **0920.zip** 並完整解壓縮。也可選 **Code → Download ZIP** 或用 `git clone` 取得原始碼。

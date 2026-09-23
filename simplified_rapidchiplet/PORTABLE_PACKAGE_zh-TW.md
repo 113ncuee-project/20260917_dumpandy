@@ -2,6 +2,8 @@
 
 Windows 10/11 x64：雙擊 repository 根目錄的 `Start Chiplet Lab.cmd`，或本資料夾的 `Start GUI.cmd`。首次需連網，之後可離線；不需要預裝 Python 或系統管理員權限。macOS／Linux 不包含在此 Windows 啟動包的支援範圍。
 
+macOS 有獨立啟動方式：請使用 repository 根目錄的 `Start Chiplet Lab.command`，並依 [macOS 快速開始](../QUICK_START_macOS_zh-TW.md) 安裝 Python 3.10 或更新版本。macOS 啟動器不使用本文件描述的 Windows Python runtime。
+
 ## 安裝內容
 
 - 官方 Python **3.13.15 Windows x64 embeddable**，由 python.org 直接取得。

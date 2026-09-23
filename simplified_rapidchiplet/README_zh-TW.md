@@ -2,6 +2,8 @@
 
 **給同學的一鍵版本：** 從 GitHub 下載並解壓縮後，雙擊根目錄 `Start Chiplet Lab.cmd`，或此目錄 `Start GUI.cmd`。首次需連網，不需預裝 Python、Codex 或自行設定 RapidChiplet 路徑。詳見 [可攜包說明](PORTABLE_PACKAGE_zh-TW.md)。
 
+**macOS：** 請從專案根目錄雙擊 `Start Chiplet Lab.command`。需要 Python 3.10 或更新版本；首次啟動會下載並驗證官方核心。完整步驟見 [macOS 快速開始](../QUICK_START_macOS_zh-TW.md)。
+
 本地修正基於 0917 commit `1dc98c3f607692b0da6c8fe22e3676cbbc8ab08c`。
 
 **目前版本請先閱讀 [GUI 與多模型說明](GUI_GUIDE_zh-TW.md)。** 執行 `python gui.py` 或雙擊 `Start GUI.cmd`，可分別設定 Power／Area／Latency 的嚴格選項、選擇四個已實際校驗的模型，並查看真實放置與 traffic 路由。偏好權重已改為 0.6／0.2／0.2。下面的原始實作與驗證文件保留為修改前基準。

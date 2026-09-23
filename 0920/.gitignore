@@ -1,0 +1,33 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Generated outputs
+simplified_rapidchiplet/results/
+
+# Browser automation profiles and crash dumps
+edge-profile/
+Crashpad/
+*.dmp
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Local bootstrap downloads, package builds and clean-install tests
+packaging_cache/
+dist/
+packaging_test*/
+**/.runtime/
+

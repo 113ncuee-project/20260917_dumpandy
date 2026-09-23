@@ -4,6 +4,8 @@
 
 ## 開啟方式
 
+macOS 使用者請從專案根目錄雙擊 `Start Chiplet Lab.command`；需 Python 3.10 或更新版本。首次會準備經 SHA-256 驗證的官方核心，之後可離線使用。詳細步驟見 [macOS 快速開始](../QUICK_START_macOS_zh-TW.md)。
+
 **GitHub 同學版已改為自動安裝：** Windows 10/11 x64 完整解壓縮後，雙擊根目錄 `Start Chiplet Lab.cmd`，首次連網下載固定版本 Python 與官方 RapidChiplet，之後可離線。預設網址使用自動選取的 port，以啟動視窗顯示為準。詳見 [可攜包說明](PORTABLE_PACKAGE_zh-TW.md)。以下 `python gui.py` 是已完成環境準備者的手動啟動方式。
 
 在本資料夾雙擊 **Start GUI.cmd**，或在 VS Code 終端執行：

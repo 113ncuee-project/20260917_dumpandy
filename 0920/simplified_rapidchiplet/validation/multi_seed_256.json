@@ -1,0 +1,386 @@
+[
+  {
+    "bandwidth_bits_per_cycle": 256.0,
+    "preference": "balanced",
+    "seed": 20260919,
+    "backend": "official",
+    "status": "completed",
+    "evaluations": 128,
+    "episodes": 1102,
+    "stopping_reason": "evaluation_budget",
+    "design_space_size": 20176298,
+    "global_optimum_certified": false,
+    "first_reward": 0.6630929977777212,
+    "best_reward": 0.6630929977777212,
+    "policy_reward": 0.6630929977777212,
+    "policy_matches_best": true,
+    "replay_converged": true,
+    "random_evaluations": 128,
+    "random_best_reward": 0.6630929977777212,
+    "ppa_feasible": true,
+    "violated_constraints": [],
+    "architecture_feasible": true,
+    "latency_s": 0.2057630526287493,
+    "area_mm2": 712.5259085625046,
+    "power_w": 3.5531004545689573,
+    "energy_per_inference_j": 0.7310967958287055,
+    "power_fixed_utilization_w": 7.8943636187501465,
+    "fps_reported": 8.192308038324915,
+    "groups": [
+      [
+        0,
+        9,
+        2
+      ],
+      [
+        9,
+        14,
+        2
+      ],
+      [
+        14,
+        17,
+        4
+      ],
+      [
+        17,
+        18,
+        1
+      ]
+    ],
+    "mapping_strategies": [
+      "output_channel",
+      "output_channel",
+      "output_channel",
+      "single"
+    ],
+    "learned_actions": 526,
+    "explore_steps": 800,
+    "exploit_steps": 3894,
+    "explored_strategies": [
+      "input_channel",
+      "output_channel",
+      "single"
+    ]
+  },
+  {
+    "bandwidth_bits_per_cycle": 256.0,
+    "preference": "balanced",
+    "seed": 20260920,
+    "backend": "official",
+    "status": "completed",
+    "evaluations": 128,
+    "episodes": 861,
+    "stopping_reason": "evaluation_budget",
+    "design_space_size": 20176298,
+    "global_optimum_certified": false,
+    "first_reward": 0.6630929977777212,
+    "best_reward": 0.6630929977777212,
+    "policy_reward": 0.6630929977777212,
+    "policy_matches_best": true,
+    "replay_converged": true,
+    "random_evaluations": 128,
+    "random_best_reward": 0.6630929977777212,
+    "ppa_feasible": true,
+    "violated_constraints": [],
+    "architecture_feasible": true,
+    "latency_s": 0.2057630526287493,
+    "area_mm2": 712.5259085625046,
+    "power_w": 3.5531004545689573,
+    "energy_per_inference_j": 0.7310967958287055,
+    "power_fixed_utilization_w": 7.8943636187501465,
+    "fps_reported": 8.192308038324915,
+    "groups": [
+      [
+        0,
+        9,
+        2
+      ],
+      [
+        9,
+        14,
+        2
+      ],
+      [
+        14,
+        17,
+        4
+      ],
+      [
+        17,
+        18,
+        1
+      ]
+    ],
+    "mapping_strategies": [
+      "output_channel",
+      "output_channel",
+      "output_channel",
+      "single"
+    ],
+    "learned_actions": 529,
+    "explore_steps": 768,
+    "exploit_steps": 2935,
+    "explored_strategies": [
+      "input_channel",
+      "output_channel",
+      "single"
+    ]
+  },
+  {
+    "bandwidth_bits_per_cycle": 256.0,
+    "preference": "balanced",
+    "seed": 20260921,
+    "backend": "official",
+    "status": "completed",
+    "evaluations": 128,
+    "episodes": 798,
+    "stopping_reason": "evaluation_budget",
+    "design_space_size": 20176298,
+    "global_optimum_certified": false,
+    "first_reward": 0.6630929977777212,
+    "best_reward": 0.6630929977777212,
+    "policy_reward": 0.6630929977777212,
+    "policy_matches_best": true,
+    "replay_converged": true,
+    "random_evaluations": 128,
+    "random_best_reward": 0.6630929977777212,
+    "ppa_feasible": true,
+    "violated_constraints": [],
+    "architecture_feasible": true,
+    "latency_s": 0.2057630526287493,
+    "area_mm2": 712.5259085625046,
+    "power_w": 3.5531004545689573,
+    "energy_per_inference_j": 0.7310967958287055,
+    "power_fixed_utilization_w": 7.8943636187501465,
+    "fps_reported": 8.192308038324915,
+    "groups": [
+      [
+        0,
+        9,
+        2
+      ],
+      [
+        9,
+        14,
+        2
+      ],
+      [
+        14,
+        17,
+        4
+      ],
+      [
+        17,
+        18,
+        1
+      ]
+    ],
+    "mapping_strategies": [
+      "output_channel",
+      "output_channel",
+      "output_channel",
+      "single"
+    ],
+    "learned_actions": 529,
+    "explore_steps": 730,
+    "exploit_steps": 2715,
+    "explored_strategies": [
+      "input_channel",
+      "output_channel",
+      "single"
+    ]
+  },
+  {
+    "bandwidth_bits_per_cycle": 256.0,
+    "preference": "latency",
+    "seed": 20260919,
+    "backend": "official",
+    "status": "completed",
+    "evaluations": 128,
+    "episodes": 1102,
+    "stopping_reason": "evaluation_budget",
+    "design_space_size": 20176298,
+    "global_optimum_certified": false,
+    "first_reward": 0.6805216816164195,
+    "best_reward": 0.6805216816164195,
+    "policy_reward": 0.6805216816164195,
+    "policy_matches_best": true,
+    "replay_converged": true,
+    "random_evaluations": 128,
+    "random_best_reward": 0.6805216816164195,
+    "ppa_feasible": true,
+    "violated_constraints": [],
+    "architecture_feasible": true,
+    "latency_s": 0.2057630526287493,
+    "area_mm2": 712.5259085625046,
+    "power_w": 3.5531004545689573,
+    "energy_per_inference_j": 0.7310967958287055,
+    "power_fixed_utilization_w": 7.8943636187501465,
+    "fps_reported": 8.192308038324915,
+    "groups": [
+      [
+        0,
+        9,
+        2
+      ],
+      [
+        9,
+        14,
+        2
+      ],
+      [
+        14,
+        17,
+        4
+      ],
+      [
+        17,
+        18,
+        1
+      ]
+    ],
+    "mapping_strategies": [
+      "output_channel",
+      "output_channel",
+      "output_channel",
+      "single"
+    ],
+    "learned_actions": 526,
+    "explore_steps": 800,
+    "exploit_steps": 3894,
+    "explored_strategies": [
+      "input_channel",
+      "output_channel",
+      "single"
+    ]
+  },
+  {
+    "bandwidth_bits_per_cycle": 256.0,
+    "preference": "area",
+    "seed": 20260919,
+    "backend": "official",
+    "status": "completed",
+    "evaluations": 128,
+    "episodes": 1102,
+    "stopping_reason": "evaluation_budget",
+    "design_space_size": 20176298,
+    "global_optimum_certified": false,
+    "first_reward": 0.6020058564877914,
+    "best_reward": 0.6020058564877914,
+    "policy_reward": 0.6020058564877914,
+    "policy_matches_best": true,
+    "replay_converged": true,
+    "random_evaluations": 128,
+    "random_best_reward": 0.6020058564877914,
+    "ppa_feasible": true,
+    "violated_constraints": [],
+    "architecture_feasible": true,
+    "latency_s": 0.2057630526287493,
+    "area_mm2": 712.5259085625046,
+    "power_w": 3.5531004545689573,
+    "energy_per_inference_j": 0.7310967958287055,
+    "power_fixed_utilization_w": 7.8943636187501465,
+    "fps_reported": 8.192308038324915,
+    "groups": [
+      [
+        0,
+        9,
+        2
+      ],
+      [
+        9,
+        14,
+        2
+      ],
+      [
+        14,
+        17,
+        4
+      ],
+      [
+        17,
+        18,
+        1
+      ]
+    ],
+    "mapping_strategies": [
+      "output_channel",
+      "output_channel",
+      "output_channel",
+      "single"
+    ],
+    "learned_actions": 526,
+    "explore_steps": 800,
+    "exploit_steps": 3894,
+    "explored_strategies": [
+      "input_channel",
+      "output_channel",
+      "single"
+    ]
+  },
+  {
+    "bandwidth_bits_per_cycle": 256.0,
+    "preference": "power",
+    "seed": 20260919,
+    "backend": "official",
+    "status": "completed",
+    "evaluations": 128,
+    "episodes": 1102,
+    "stopping_reason": "evaluation_budget",
+    "design_space_size": 20176298,
+    "global_optimum_certified": false,
+    "first_reward": 0.7175258739409699,
+    "best_reward": 0.7175258739409699,
+    "policy_reward": 0.7175258739409699,
+    "policy_matches_best": true,
+    "replay_converged": true,
+    "random_evaluations": 128,
+    "random_best_reward": 0.7175258739409699,
+    "ppa_feasible": true,
+    "violated_constraints": [],
+    "architecture_feasible": true,
+    "latency_s": 0.2057630526287493,
+    "area_mm2": 712.5259085625046,
+    "power_w": 3.5531004545689573,
+    "energy_per_inference_j": 0.7310967958287055,
+    "power_fixed_utilization_w": 7.8943636187501465,
+    "fps_reported": 8.192308038324915,
+    "groups": [
+      [
+        0,
+        9,
+        2
+      ],
+      [
+        9,
+        14,
+        2
+      ],
+      [
+        14,
+        17,
+        4
+      ],
+      [
+        17,
+        18,
+        1
+      ]
+    ],
+    "mapping_strategies": [
+      "output_channel",
+      "output_channel",
+      "output_channel",
+      "single"
+    ],
+    "learned_actions": 526,
+    "explore_steps": 800,
+    "exploit_steps": 3894,
+    "explored_strategies": [
+      "input_channel",
+      "output_channel",
+      "single"
+    ]
+  }
+]

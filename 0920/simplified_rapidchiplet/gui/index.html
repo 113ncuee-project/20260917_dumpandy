@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chiplet Lab · PPA 設計探索</title><link rel="stylesheet" href="/style.css"><script src="/app.js" defer></script></head>
+<body>
+<header><a class="brand" href="/" aria-label="Chiplet Lab 首頁"><span class="brand-icon">▦</span> CHIPLET <strong>LAB</strong></a>
+<span class="header-note">0920 · Design space exploration</span><span class="connection" id="connection">連線中</span></header>
+<main>
+<div class="page-heading"><div><p class="eyebrow">FROM MODEL TO CHIPLET</p><h1>把你的 PPA 目標，變成可檢視的設計。</h1><p class="muted">選擇模型與偏好，探索分組及 mapping，查看實際放置與資料傳輸路徑。</p></div><span class="pill">Batch 1 · FP32 · 224 × 224</span></div>
+<div class="workspace">
+<aside class="panel controls"><form id="search-form">
+<fieldset id="inputs"><div class="section-heading"><span class="step">01</span><h2>PPA 限制</h2></div>
+<p class="hint">勾選嚴格遵守，該項超標的設計即排除。未勾選則以 bonus / penalty 評分。</p>
+<div class="limit-head"><span>目標上限</span><span>嚴格遵守</span></div>
+<div class="limit-row"><label for="power">Power <span class="unit">W</span><input id="power" type="number" min="0.000000001" max="1000000000000" step="any" required></label><input id="strict-power" type="checkbox" aria-label="嚴格遵守 Power 限制"></div>
+<div class="limit-row"><label for="area">Area <span class="unit">mm²</span><input id="area" type="number" min="0.000000001" max="1000000000000" step="any" required></label><input id="strict-area" type="checkbox" aria-label="嚴格遵守 Area 限制"></div>
+<div class="limit-row"><label for="latency">Latency <span class="unit">ms</span><input id="latency" type="number" min="0.000000001" max="1000000000000" step="any" required></label><input id="strict-latency" type="checkbox" aria-label="嚴格遵守 Latency 限制"></div>
+<div class="section-heading divided"><span class="step">02</span><h2>設計偏好</h2></div>
+<div class="preferences" role="radiogroup" aria-label="設計偏好">
+<label><input type="radio" name="preference" value="balanced" checked><span>均衡</span></label>
+<label><input type="radio" name="preference" value="power"><span>低功耗</span></label>
+<label><input type="radio" name="preference" value="area"><span>小面積</span></label>
+<label><input type="radio" name="preference" value="latency"><span>低延遲</span></label></div>
+<p id="weight-note" class="hint mono"></p>
+<div class="section-heading divided"><span class="step">03</span><h2>模型</h2><button class="text-button" id="select-all" type="button">全選</button></div>
+<div id="model-options"></div>
+<details class="advanced"><summary>搜尋設定</summary><div class="two-inputs"><label>評估預算<input id="budget" type="number" min="1" max="1024" step="1" required></label><label>Random seed<input id="seed" type="number" min="0" max="4294967295" step="1" required></label></div><p class="hint">每個模型獨立執行 Q-learning，使用相同 seed。預算為不重複設計的評估次數。</p></details>
+</fieldset><p id="form-error" class="error" role="alert"></p>
+<button id="run" class="primary" type="submit" disabled>開始探索 <span>↗</span></button></form>
+<button id="cancel" class="secondary" type="button" hidden>取消搜尋</button>
+<div id="progress-box" hidden><div class="progress-label"><span id="progress-text" aria-live="polite"></span><span id="progress-number"></span></div><progress id="progress" max="128" value="0"></progress></div>
+<details class="hardware"><summary>目前硬體設定</summary><dl id="hardware-values"></dl><p class="hint">讀取 configs/defaults.json；修改硬體後請重新啟動 GUI。</p></details>
+</aside>
+<section class="results-area" aria-label="設計結果">
+<div class="results-toolbar"><div><p class="eyebrow">EXPLORATION RESULTS</p><h2 id="result-heading">準備探索</h2></div><div class="exports" id="exports" hidden><a id="export-json" class="secondary">JSON ↓</a><a id="export-csv" class="secondary">CSV ↓</a></div></div>
+<div id="job-note" class="notice" hidden aria-live="polite"></div><div id="model-tabs" role="tablist" aria-label="模型結果"></div>
+<div id="empty-state" class="panel empty-state"><div class="empty-icon">▦</div><h2>每一條連線，都來自實際候選設計。</h2><p>執行探索後，這裡會顯示 chiplet 放置、實體 links、<br>tensor traffic 路由，以及各項 PPA 結果。</p><div class="empty-tags"><span>真實座標</span><span>依 tensor 追蹤</span><span>逐項限制</span></div></div>
+<div id="result-content" hidden>
+<div class="result-meta"><span id="result-status" class="pill"></span><span id="result-subtitle" class="muted"></span></div>
+<div class="metrics" id="metrics"></div><p class="notice">Power = 單次推論能量 ÷ Batch-1 觀測時間；使用估計 active time，非峰值功率。Area 是放置外框。FPS 僅為輸出，嚴格限制套用於這些估計值。</p><section class="panel detail"><h2>Power 與 Area 組成</h2><div id="power-area-breakdown"></div></section>
+<section class="panel placement"><div class="panel-heading"><div><h2>Chiplet 放置與連線</h2><p id="graph-caption" class="hint"></p></div><label class="zoom-label">縮放 <input id="zoom" type="range" min="75" max="200" step="25" value="100" aria-label="放置圖縮放"></label></div>
+<div class="graph-controls"><label>Traffic <select id="event-select" aria-label="選擇 tensor 通訊事件"><option value="physical">僅實體連線</option></select></label><button id="export-svg" class="text-button" type="button">匯出 SVG ↓</button></div>
+<div class="graph-scroll"><svg id="placement-svg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="候選設計實際 chiplet 放置與連線"></svg></div>
+<div id="group-legend" class="legend"></div><div id="route-info" class="route-info"></div>
+<div id="chiplet-info" class="chiplet-info">點選 chiplet 查看配置、座標與工作量。</div></section>
+<div class="detail-grid"><section class="panel detail"><h2>Latency 組成</h2><div id="latency-breakdown"></div><p class="hint">Batch-1 估計：Σ group compute + Σ (link serialization + path)。FPS 僅作為結果指標。</p></section>
+<section class="panel detail"><h2>獎勵與限制</h2><div id="reward-breakdown"></div><p class="hint">未勾選的項目：低於限制按餘裕加分，超出按比例扣分；架構可行性始終必須滿足。</p></section></div>
+<section class="panel detail"><h2>分組與 mapping</h2><div class="table-scroll"><table><thead><tr><th>Group</th><th>Blocks</th><th>Chiplets</th><th>Mapping</th><th>SRAM / chiplet</th></tr></thead><tbody id="mapping-table"></tbody></table></div></section>
+<details class="panel detail"><summary>模型校驗與搜尋範圍</summary><div id="audit-details"></div></details>
+</div>
+<div id="comparison" class="panel detail" hidden><h2>本次模型比較</h2><div class="table-scroll"><table><thead><tr><th>模型</th><th>狀態</th><th>Chiplets</th><th>Power (W)</th><th>Area (mm²)</th><th>Latency (ms)</th></tr></thead><tbody id="comparison-table"></tbody></table></div></div>
+</section></div>
+<footer>分析估計，非晶片量測。模型 forward 用於校驗形狀與運算量；PPA 由目前硬體模型估算。固定 mesh 放置，RL 搜尋 block 分組與 mapping。</footer>
+</main></body></html>
